@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nomen</title>
+  <meta name="description" content="Flashcards de aniones para Química Inorgánica" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- SCREEN: Home -->
+    <div id="screen-home" class="screen active">
+      <header class="home-header">
+        <div class="logo-mark">⬡</div>
+        <h1>Nomen</h1>
+        <p class="subtitle">Nomenclatura · Química Inorgánica</p>
+      </header>
+
+      <nav class="mode-grid">
+        <button class="mode-card" data-mode="nombre-formula">
+          <span class="mode-icon">𝑓(x)</span>
+          <span class="mode-label">Nombre → Fórmula</span>
+          <span class="mode-desc">Ver el nombre, escribir la fórmula</span>
+        </button>
+        <button class="mode-card" data-mode="formula-nombre">
+          <span class="mode-icon">αβ</span>
+          <span class="mode-label">Fórmula → Nombre</span>
+          <span class="mode-desc">Ver la fórmula, recordar el nombre</span>
+        </button>
+        <button class="mode-card" data-mode="carga">
+          <span class="mode-icon">±</span>
+          <span class="mode-label">Carga & Oxidación</span>
+          <span class="mode-desc">Identificar la carga del anión</span>
+        </button>
+        <button class="mode-card" data-mode="sales">
+          <span class="mode-icon">⚗</span>
+          <span class="mode-label">Sales que forma</span>
+          <span class="mode-desc">Completar el nombre de la sal</span>
+        </button>
+      </nav>
+
+      <section class="set-selector">
+        <p class="set-label">Sección</p>
+        <div class="section-tabs">
+          <button class="section-tab active" data-section="aniones">Aniones</button>
+          <button class="section-tab" data-section="cationes">Cationes</button>
+          <button class="section-tab" data-section="acidos">Ácidos</button>
+          <button class="section-tab" data-section="todo">Todo</button>
+        </div>
+
+        <!-- Aniones subgrupos -->
+        <div class="set-tabs" id="subtabs-aniones">
+          <button class="set-tab active" data-set="all">Todos</button>
+          <button class="set-tab" data-set="poliatómicos">Poliatómicos</button>
+          <button class="set-tab" data-set="monoatómicos">Monoatómicos</button>
+          <button class="set-tab" data-set="oxo">Oxoaniones</button>
+          <button class="set-tab" data-set="halógenos">Halógenos</button>
+        </div>
+
+        <!-- Cationes subgrupos -->
+        <div class="set-tabs hidden" id="subtabs-cationes">
+          <button class="set-tab active" data-set="cationes">Todos (4)</button>
+        </div>
+
+        <!-- Ácidos subgrupos -->
+        <div class="set-tabs hidden" id="subtabs-acidos">
+          <button class="set-tab active" data-set="acidos">Todos</button>
+          <button class="set-tab" data-set="hidrácidos">Hidrácidos</button>
+          <button class="set-tab" data-set="oxoácidos">Oxoácidos</button>
+        </div>
+
+        <!-- Todo -->
+        <div class="set-tabs hidden" id="subtabs-todo">
+          <button class="set-tab active" data-set="todo">Todo (65)</button>
+        </div>
+      </section>
+
+      <div class="stats-bar">
+        <div class="stat"><span id="stat-total">0</span><small>total</small></div>
+        <div class="stat"><span id="stat-learned">0</span><small>aprendidas</small></div>
+        <div class="stat"><span id="stat-streak">0</span><small>racha</small></div>
+      </div>
+
+      <button class="btn-primary" id="btn-start">Comenzar sesión</button>
+      <button class="btn-ghost" id="btn-reset">Reiniciar progreso</button>
+    </div>
+
+    <!-- SCREEN: Quiz -->
+    <div id="screen-quiz" class="screen">
+      <div class="quiz-topbar">
+        <button id="btn-back" class="icon-btn">←</button>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+          <span id="progress-label">1 / 10</span>
+        </div>
+        <div class="streak-badge" id="streak-badge">🔥 0</div>
+      </div>
+
+      <div class="card-arena">
+        <div class="card" id="flashcard">
+          <div class="card-front" id="card-front">
+            <div class="card-group" id="card-group-label"></div>
+            <div class="card-question" id="card-question"></div>
+            <div class="card-hint" id="card-hint"></div>
+            <button class="btn-reveal" id="btn-reveal">Ver respuesta</button>
+          </div>
+          <div class="card-back hidden" id="card-back">
+            <div class="card-answer" id="card-answer"></div>
+            <div class="card-details" id="card-details"></div>
+            <div class="card-actions">
+              <button class="btn-wrong" id="btn-wrong">✗ No sabía</button>
+              <button class="btn-right" id="btn-right">✓ Lo sabía</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: Results -->
+    <div id="screen-results" class="screen">
+      <div class="results-inner">
+        <div class="results-icon" id="results-icon">🎯</div>
+        <h2 id="results-title">Sesión completa</h2>
+        <p id="results-msg"></p>
+        <div class="results-stats">
+          <div class="rstat"><span id="r-correct"></span><small>correctas</small></div>
+          <div class="rstat"><span id="r-wrong"></span><small>a repasar</small></div>
+          <div class="rstat"><span id="r-pct"></span><small>precisión</small></div>
+        </div>
+        <button class="btn-primary" id="btn-review">Repasar errores</button>
+        <button class="btn-ghost" id="btn-home">Volver al inicio</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
