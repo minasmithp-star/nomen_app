@@ -305,7 +305,7 @@ function rate(level) {
   flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
   flip.style.transform  = 'rotateY(360deg)';
 
-  // A los 200ms (mitad del flip) actualizamos el contenido — la tarjeta está de canto, no se ve nada
+  // A los 150ms (mitad del flip) actualizamos el contenido — la tarjeta está de canto, no se ve nada
   setTimeout(() => {
     session.index++;
     const next = session.queue[session.index];
@@ -326,7 +326,7 @@ function rate(level) {
     $('progress-fill').style.width  = pct + '%';
     $('progress-label').textContent = `${session.index + 1} / ${session.queue.length}`;
     $('streak-badge').textContent   = `❤︎ ${state.streak}`;
-  }, 200);
+  }, 150);
 
   // Al terminar el flip (400ms) reseteamos transform para que el próximo flip salga bien
   setTimeout(() => {
