@@ -322,7 +322,8 @@ function rate(level) {
     $('progress-fill').style.width  = pct + '%';
     $('progress-label').textContent = `${session.index + 1} / ${session.queue.length}`;
     $('streak-badge').textContent   = `❤︎ ${state.streak}`;
-    back.style.visibility = 'visible';
+    // Restaurar visibilidad del reverso después de 450ms (cuando el flip ya terminó)
+    setTimeout(() => { back.style.visibility = 'visible'; }, 450);
   }
 
   // Al terminar el flip reseteamos transform
