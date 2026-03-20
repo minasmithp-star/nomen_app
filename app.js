@@ -293,20 +293,31 @@ function rate(level) {
   // Ocultar botones
   $('rating-row').classList.remove('visible');
 
+  // ── Estrategia limpia ──────────────────────────────────
+  // 1. La tarjeta está en -180deg (reverso visible)
+  // 2. Continuamos a -360deg — durante la primera mitad (0→90deg de este tramo)
+  //    el reverso todavía es visible (bien)
+  // 3. A los 200ms (tarjeta de canto) cargamos el frente de la nueva tarjeta
+  //    y ocultamos el reverso viejo
+  // 4. La segunda mitad del flip muestra el frente nuevo
+
   const flip = $('card-flip');
-  const back = $('card-flip').querySelector('.card-face-back');
+  const back  = flip.querySelector('.card-face-back');
+  const front = flip.querySelector('.card-face-front');
 
-  // Ocultamos el reverso inmediatamente — así durante el giro no se ve el contenido viejo
-  back.style.visibility = 'hidden';
-
-  // Continuamos de 180° → 360° (frente de la siguiente tarjeta)
-  flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
+  flip.style.transition = 'transform .5s cubic-bezier(.4,0,.2,1)';
   flip.style.transform  = 'rotateY(-360deg)';
 
-  // Cargamos el contenido nuevo inmediatamente — el reverso está oculto así no se ve
-  session.index++;
-  const next = session.queue[session.index];
-  if (next) {
+  setTimeout(() => {
+    // Tarjeta de canto — cargamos la nueva sin que se vea
+    session.index++;
+    const next = session.queue[session.index];
+    if (!next) return;
+
+    // Ocultar reverso viejo, mostrar frente nuevo
+    back.style.visibility  = 'hidden';
+    front.style.visibility = 'visible';
+
     const c = getAccent(next);
     document.documentElement.style.setProperty('--accent',    c.a);
     document.documentElement.style.setProperty('--accent-bg', c.bg);
@@ -322,9 +333,19 @@ function rate(level) {
     $('progress-fill').style.width  = pct + '%';
     $('progress-label').textContent = `${session.index + 1} / ${session.queue.length}`;
     $('streak-badge').textContent   = `❤︎ ${state.streak}`;
-    // Restaurar visibilidad del reverso después de 450ms (cuando el flip ya terminó)
-    setTimeout(() => { back.style.visibility = 'visible'; }, 450);
-  }
+  }, 200);
+
+  // Al terminar el flip: resetear todo
+  setTimeout(() => {
+    if (!session.queue[session.index]) { showResults(); return; }
+    flip.style.transition  = 'none';
+    flip.style.transform   = 'rotateY(0deg)';
+    back.style.visibility  = 'visible';
+    session.isFlipped = false;
+    requestAnimationFrame(() => {
+      flip.style.transition = 'transform .5s cubic-bezier(.4,0,.2,1)';
+    });
+  }, 520);
 
   // Al terminar el flip reseteamos transform
   setTimeout(() => {
