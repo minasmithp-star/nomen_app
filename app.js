@@ -303,11 +303,10 @@ function rate(level) {
   flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
   flip.style.transform  = 'rotateY(-360deg)';
 
-  // A los 150ms cargamos el contenido nuevo (tarjeta de canto, invisible de todas formas)
-  setTimeout(() => {
-    session.index++;
-    const next = session.queue[session.index];
-    if (!next) return;
+  // Cargamos el contenido nuevo inmediatamente — el reverso está oculto así no se ve
+  session.index++;
+  const next = session.queue[session.index];
+  if (next) {
     const c = getAccent(next);
     document.documentElement.style.setProperty('--accent',    c.a);
     document.documentElement.style.setProperty('--accent-bg', c.bg);
@@ -323,9 +322,8 @@ function rate(level) {
     $('progress-fill').style.width  = pct + '%';
     $('progress-label').textContent = `${session.index + 1} / ${session.queue.length}`;
     $('streak-badge').textContent   = `❤︎ ${state.streak}`;
-    // Restaurar visibilidad del reverso para el próximo flip
     back.style.visibility = 'visible';
-  }, 150);
+  }
 
   // Al terminar el flip reseteamos transform
   setTimeout(() => {
