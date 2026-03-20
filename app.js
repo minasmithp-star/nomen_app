@@ -1,339 +1,181 @@
-// app.js — Nomen · lógica principal con flip 3D y colores por sección
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nomen</title>
+  <meta name="description" content="Flashcards de nomenclatura para Química Inorgánica" />
+  <meta name="theme-color" content="#a78bfa" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
 
-const STATE_KEY = 'nomen-v2';
+  <!-- SCREEN: Home -->
+  <div id="screen-home" class="screen active">
+    <header class="home-header">
+      <div class="logo-mark">⬡</div>
+      <h1>Nomen</h1>
+      <p class="subtitle">Nomenclatura · Química Inorgánica</p>
+    </header>
 
-// Color por tipo de ion — se aplica a --accent en cada tarjeta
-const SECTION_COLORS = {
-  poliatómicos: '#8b5cf6',  // violeta
-  monoatómicos: '#06b6d4',  // cyan
-  cationes:     '#f97316',  // naranja
-  hidrácido:    '#10b981',  // verde esmeralda
-  oxoácido:     '#f59e0b',  // ámbar
-  // subgrupos especiales
-  halógenos:    '#ec4899',  // rosa
-  azufre:       '#84cc16',  // lima
-  nitrógeno:    '#6366f1',  // indigo
-  fósforo:      '#14b8a6',  // teal
-  cromo:        '#ef4444',  // rojo
-  manganeso:    '#a855f7',  // púrpura
-  oxígeno:      '#3b82f6',  // azul
-  carbono:      '#64748b',  // slate
-  arsénico:     '#d97706',  // ocre
-  boro:         '#22c55e',  // verde
-  default:      '#4f7cff',  // azul base
-};
+    <!-- FILTROS — primero -->
+    <section class="set-selector">
+      <p class="set-label">Sección</p>
+      <div class="section-tabs">
+        <button class="section-tab active" data-section="aniones">Aniones</button>
+        <button class="section-tab" data-section="cationes">Cationes</button>
+        <button class="section-tab" data-section="acidos">Ácidos</button>
+        <button class="section-tab" data-section="todo">Todo</button>
+      </div>
+      <div class="set-tabs" id="subtabs-aniones">
+        <button class="set-tab active" data-set="all">Todos</button>
+        <button class="set-tab" data-set="poliatómicos">Poliatómicos</button>
+        <button class="set-tab" data-set="monoatómicos">Monoatómicos</button>
+        <button class="set-tab" data-set="oxo">Oxoaniones</button>
+        <button class="set-tab" data-set="halógenos">Halógenos</button>
+      </div>
+      <div class="set-tabs hidden" id="subtabs-cationes">
+        <button class="set-tab active" data-set="cationes">Todos (4)</button>
+      </div>
+      <div class="set-tabs hidden" id="subtabs-acidos">
+        <button class="set-tab active" data-set="acidos">Todos</button>
+        <button class="set-tab" data-set="hidrácidos">Hidrácidos</button>
+        <button class="set-tab" data-set="oxoácidos">Oxoácidos</button>
+      </div>
+      <div class="set-tabs hidden" id="subtabs-todo">
+        <button class="set-tab active" data-set="todo">Todo (65)</button>
+      </div>
+    </section>
 
-function getAccent(card) {
-  if (card.subgrupo && SECTION_COLORS[card.subgrupo]) return SECTION_COLORS[card.subgrupo];
-  if (card.tipo && SECTION_COLORS[card.tipo]) return SECTION_COLORS[card.tipo];
-  return SECTION_COLORS.default;
-}
+    <!-- MODOS — después -->
+    <nav class="mode-grid">
+      <button class="mode-card selected" data-mode="nombre-formula">
+        <span class="mode-icon">𝑓(x)</span>
+        <span class="mode-label">Nombre → Fórmula</span>
+        <span class="mode-desc">Ver el nombre, recordar la fórmula</span>
+      </button>
+      <button class="mode-card" data-mode="formula-nombre">
+        <span class="mode-icon">αβ</span>
+        <span class="mode-label">Fórmula → Nombre</span>
+        <span class="mode-desc">Ver la fórmula, recordar el nombre</span>
+      </button>
+      <button class="mode-card" data-mode="carga">
+        <span class="mode-icon">±</span>
+        <span class="mode-label">Carga & Oxidación</span>
+        <span class="mode-desc">Identificar la carga del ion</span>
+      </button>
+      <button class="mode-card" data-mode="sales">
+        <span class="mode-icon">→</span>
+        <span class="mode-label">Sales que forma</span>
+        <span class="mode-desc">Completar el nombre de la sal</span>
+      </button>
+    </nav>
 
-// ── Estado ─────────────────────────────────────────────
-let state = { learned: {}, streak: 0, bestStreak: 0 };
+    <!-- STATS — racha de días visible -->
+    <div class="stats-bar">
+      <div class="stat">
+        <span id="stat-streak">0</span>
+        <small>racha</small>
+        <tiny>días</tiny>
+      </div>
+      <div class="stat">
+        <span id="stat-best">0</span>
+        <small>mejor</small>
+        <tiny>racha</tiny>
+      </div>
+      <div class="stat">
+        <span id="stat-learned">0</span>
+        <small>aprendidas</small>
+        <tiny>de <b id="stat-total">0</b></tiny>
+      </div>
+    </div>
 
-let session = {
-  mode: 'nombre-formula',
-  queue: [], index: 0,
-  correct: 0, wrong: 0, ok: 0,
-  hardCards: [],
-  isFlipped: false,
-};
+    <button class="btn-primary" id="btn-start">Comenzar sesión</button>
+    <button class="btn-ghost" id="btn-reset">Reiniciar progreso</button>
+  </div>
 
-function saveState() { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch {} }
-function loadState() {
-  try { const s = localStorage.getItem(STATE_KEY); if (s) state = { ...state, ...JSON.parse(s) }; } catch {}
-}
+  <!-- SCREEN: Quiz -->
+  <div id="screen-quiz" class="screen">
+    <div class="quiz-topbar">
+      <button id="btn-back" class="icon-btn">←</button>
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <span id="progress-label">1 / 10</span>
+      </div>
+      <div class="streak-badge" id="streak-badge">❤︎ 0</div>
+    </div>
 
-// ── DOM ────────────────────────────────────────────────
-const $ = id => document.getElementById(id);
-const screens = { home: $('screen-home'), quiz: $('screen-quiz'), results: $('screen-results') };
+    <div class="card-arena">
+      <div class="card-scene" id="card-scene" onclick="handleFlip()">
+        <div class="card-flip" id="card-flip">
+          <div class="card-face card-face-front">
+            <div class="card-subgroup" id="card-group-label"></div>
+            <div class="card-question" id="card-question"></div>
+            <div class="card-tap-hint">toca para voltear</div>
+          </div>
+          <div class="card-face card-face-back">
+            <div class="card-subgroup" id="card-group-label-back"></div>
+            <div class="card-answer" id="card-answer"></div>
+            <div class="card-details-mini" id="card-details"></div>
+          </div>
+        </div>
+      </div>
 
-function showScreen(name) {
-  Object.values(screens).forEach(s => s.classList.remove('active'));
-  screens[name].classList.add('active');
-}
+      <div class="rating-row" id="rating-row">
+        <button class="rate-btn rate-hard" onclick="rate('hard')">✕ No sabía</button>
+        <button class="rate-btn rate-ok"   onclick="rate('ok')">— Regular</button>
+        <button class="rate-btn rate-easy" onclick="rate('easy')">✓ Lo sabía</button>
+      </div>
+    </div>
+  </div>
 
-// ── Home ───────────────────────────────────────────────
-function updateHomeStats() {
-  $('stat-total').textContent   = TODOS.length;
-  $('stat-learned').textContent = Object.keys(state.learned).length;
-  $('stat-streak').textContent  = state.streak;
-}
+  <!-- SCREEN: Results -->
+  <div id="screen-results" class="screen">
+    <div class="results-inner">
+      <div class="results-icon" id="results-icon">◈</div>
+      <h2 id="results-title">Sesión completa</h2>
+      <p id="results-msg"></p>
 
-// Mode selection
-let selectedMode = 'nombre-formula';
-document.querySelectorAll('.mode-card').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.mode-card').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    selectedMode = btn.dataset.mode;
-  });
-});
+      <!-- Stats de sesión -->
+      <div class="results-stats">
+        <div class="rstat"><span id="r-correct"></span><small>lo sabía</small></div>
+        <div class="rstat"><span id="r-wrong"></span><small>no sabía</small></div>
+        <div class="rstat"><span id="r-pct"></span><small>precisión</small></div>
+      </div>
 
-// Section + subtab selection
-let selectedSet = 'all';
-let selectedSection = 'aniones';
+      <!-- Racha de días -->
+      <div class="results-streak-box">
+        <div class="rsb-main" id="results-streak">❤︎ 0 días</div>
+        <div class="rsb-sub">
+          <span id="results-learned">0</span> iones aprendidos ·
+          <span id="results-best">mejor: 0</span>
+        </div>
+      </div>
 
-document.querySelectorAll('.section-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    selectedSection = tab.dataset.section;
-    ['aniones','cationes','acidos','todo'].forEach(s => {
-      const el = document.getElementById(`subtabs-${s}`);
-      if (el) el.classList.toggle('hidden', s !== selectedSection);
-    });
-    const first = document.querySelector(`#subtabs-${selectedSection} .set-tab`);
-    if (first) {
-      document.querySelectorAll(`#subtabs-${selectedSection} .set-tab`).forEach(t => t.classList.remove('active'));
-      first.classList.add('active');
-      selectedSet = first.dataset.set;
-    }
-  });
-});
+      <!-- Gráfico de historial -->
+      <div class="chart-wrap">
+        <p class="chart-title">Últimas sesiones</p>
+        <div class="history-chart" id="history-chart"></div>
+      </div>
 
-document.querySelectorAll('.set-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    tab.closest('.set-tabs').querySelectorAll('.set-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    selectedSet = tab.dataset.set;
-  });
-});
+      <button class="btn-primary" id="btn-review">Repasar los que fallé</button>
+      <button class="btn-ghost"   id="btn-home">Volver al inicio</button>
+    </div>
+  </div>
 
-$('btn-start').addEventListener('click', () => {
-  const pool = GRUPOS[selectedSet] || TODOS;
-  startSession(selectedMode, pool);
-});
-
-$('btn-reset').addEventListener('click', () => {
-  if (confirm('¿Reiniciar todo el progreso?')) {
-    state = { learned: {}, streak: 0, bestStreak: 0 };
-    saveState(); updateHomeStats();
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   }
-});
-
-// ── Session ────────────────────────────────────────────
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function startSession(mode, pool) {
-  session = { mode, queue: shuffle(pool), index: 0, correct: 0, wrong: 0, ok: 0, hardCards: [], isFlipped: false };
-  showScreen('quiz');
-  renderCard();
-}
-
-// ── Card render ────────────────────────────────────────
-function renderCard() {
-  const card = session.queue[session.index];
-  if (!card) { showResults(); return; }
-
-  const flip = $('card-flip');
-
-  // Si la tarjeta está volteada, primero la giramos de vuelta
-  // y actualizamos el contenido DESPUÉS de que termine la animación
-  // para que nunca se vea la respuesta de la siguiente
-  if (session.isFlipped) {
-    flip.classList.remove('flipped');
-    $('rating-row').classList.remove('visible');
-    session.isFlipped = false;
-    setTimeout(() => _fillCard(card), 300); // esperar que termine el flip (.55s → usamos 300 para que no se vea)
-  } else {
-    _fillCard(card);
-  }
-}
-
-function _fillCard(card) {
-  // Accent color
-  const accent = getAccent(card);
-  document.documentElement.style.setProperty('--accent', accent);
-  document.documentElement.style.setProperty('--accent-bg', accent + '18');
-
-  // Progress
-  const pct = (session.index / session.queue.length) * 100;
-  $('progress-fill').style.width = pct + '%';
-  $('progress-label').textContent = `${session.index + 1} / ${session.queue.length}`;
-  $('streak-badge').textContent = `❤︎ ${state.streak}`;
-
-  // Group labels
-  const groupText = buildGroupLabel(card);
-  $('card-group-label').textContent = groupText;
-  $('card-group-label-back').textContent = groupText;
-
-  // Question & answer
-  const q = buildQuestion(card, session.mode);
-  $('card-question').textContent = q.question;
-  $('card-answer').textContent   = q.answer;
-
-  // Details on back
-  buildDetails(card, session.mode);
-
-  // Re-trigger entry animation
-  const scene = $('card-scene');
-  scene.style.animation = 'none';
-  scene.offsetHeight;
-  scene.style.animation = '';
-}
-
-function buildGroupLabel(card) {
-  const isCation = card.tipo === 'cationes';
-  const isAcido  = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
-  if (isCation) return 'CATIÓN · ' + (card.subgrupo || '').toUpperCase();
-  if (isAcido)  return 'ÁCIDO · ' + card.tipo.toUpperCase();
-  return card.tipo.toUpperCase() + (card.subgrupo ? ' · ' + card.subgrupo.toUpperCase() : '');
-}
-
-function buildQuestion(card, mode) {
-  const isCation = card.tipo === 'cationes';
-  const isAcido  = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
-  switch (mode) {
-    case 'nombre-formula': return { question: card.nombre, answer: card.formula };
-    case 'formula-nombre': return { question: card.formula, answer: card.nombre };
-    case 'carga':
-      // Solo nombre — la fórmula ya contiene la carga y revela la respuesta
-      if (isAcido) return { question: card.nombre, answer: card.anion };
-      return { question: card.nombre, answer: `Carga: ${card.carga > 0 ? '+' : ''}${card.carga}` };
-    case 'sales':
-      return { question: card.nombre, answer: card.sales };
-    default: return { question: card.nombre, answer: card.formula };
-  }
-}
-
-function buildDetails(card, mode) {
-  const container = $('card-details');
-  container.innerHTML = '';
-  const isCation = card.tipo === 'cationes';
-  const isAcido  = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
-  const rows = [];
-
-  if (mode !== 'nombre-formula') rows.push({ l: 'Nombre',   v: card.nombre });
-  if (mode !== 'formula-nombre') rows.push({ l: 'Fórmula',  v: card.formula });
-
-  if (isAcido) {
-    if (mode !== 'carga') rows.push({ l: 'Anión',  v: card.anion });
-    rows.push({ l: 'Ka', v: card.ka });
-  } else if (isCation) {
-    rows.push({ l: 'Carga',   v: `+${card.carga}` });
-    rows.push({ l: 'Origen',  v: card.origen });
-  } else {
-    if (mode !== 'carga') rows.push({ l: 'Carga', v: `${card.carga}` });
-    if (card.oxoacido && card.oxoacido !== '—') rows.push({ l: 'Oxoácido', v: card.oxoacido });
-  }
-
-  // Limit to 2 rows to avoid overflow on back of card
-  rows.slice(0, 2).forEach(r => {
-    const div = document.createElement('div');
-    div.className = 'detail-pill';
-    div.innerHTML = `<span class="dpill-label">${r.l}</span><span class="dpill-val">${r.v}</span>`;
-    container.appendChild(div);
-  });
-}
-
-// ── Flip ───────────────────────────────────────────────
-function handleFlip() {
-  session.isFlipped = !session.isFlipped;
-  $('card-flip').classList.toggle('flipped', session.isFlipped);
-  if (session.isFlipped) $('rating-row').classList.add('visible');
-}
-
-// ── Rating ─────────────────────────────────────────────
-function rate(level) {
-  const card = session.queue[session.index];
-  if (level === 'easy') {
-    session.correct++;
-    state.learned[card.id] = true;
-  } else if (level === 'ok') {
-    session.ok++;
-  } else {
-    session.wrong++;
-    delete state.learned[card.id];
-    session.hardCards.push(card);
-  }
-  // La racha NO se toca aquí — solo se incrementa al completar una sesión
-  saveState();
-  session.index++;
-  renderCard();
-}
-
-$('btn-back').addEventListener('click', () => { showScreen('home'); updateHomeStats(); });
-
-// ── Results ────────────────────────────────────────────
-function showResults() {
-  const total = session.correct + session.wrong;
-  const pct   = total > 0 ? Math.round((session.correct / total) * 100) : 0;
-
-  // Racha: se incrementa por completar la sesión, sin importar cuánto te equivocaste
-  state.streak++;
-  if (state.streak > state.bestStreak) state.bestStreak = state.streak;
-  saveState();
-
-  $('r-correct').textContent = session.correct;
-  $('r-wrong').textContent   = session.wrong;
-  $('r-pct').textContent     = pct + '%';
-
-  let icon = '—', title = 'Sesión completa', msg = '';
-  if (pct === 100) { icon = '◆◆◆'; title = 'Perfecto'; msg = 'Dominás todos los iones de esta sesión.'; }
-  else if (pct >= 80) { icon = '◆◆'; title = 'Muy bien'; msg = `Respondiste correctamente el ${pct}% de las tarjetas.`; }
-  else if (pct >= 50) { icon = '◆'; title = 'Sigue practicando'; msg = `Hay ${session.wrong} iones para reforzar.`; }
-  else { icon = '○'; title = 'A repasar'; msg = 'Repasá los iones difíciles antes de avanzar.'; }
-
-  $('results-icon').textContent  = icon;
-  $('results-title').textContent = title;
-  $('results-msg').textContent   = msg;
-  $('btn-review').style.display  = session.hardCards.length > 0 ? '' : 'none';
-
-  // Reset accent to default for results screen
-  document.documentElement.style.setProperty('--accent', '#4f7cff');
-
-  showScreen('results');
-  updateHomeStats();
-}
-
-$('btn-review').addEventListener('click', () => {
-  if (session.hardCards.length > 0) startSession(session.mode, session.hardCards);
-});
-$('btn-home').addEventListener('click', () => { showScreen('home'); updateHomeStats(); });
-
-// ── Notifications ──────────────────────────────────────
-async function initNotifications() {
-  if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
-  try {
-    const reg = await navigator.serviceWorker.ready;
-    if (Notification.permission === 'default') showNotifBanner(reg);
-    else if (Notification.permission === 'granted') reg.active?.postMessage('app-opened');
-  } catch {}
-}
-
-function showNotifBanner(reg) {
-  if (localStorage.getItem('notif-dismissed')) return;
-  const banner = document.createElement('div');
-  banner.id = 'notif-banner';
-  banner.innerHTML = `
-    <span>🕭 Activar recordatorios de racha</span>
-    <div class="notif-actions">
-      <button id="notif-yes">Sí</button>
-      <button id="notif-no">No</button>
-    </div>`;
-  $('screen-home').appendChild(banner);
-  $('notif-yes').addEventListener('click', async () => {
-    banner.remove();
-    const perm = await Notification.requestPermission();
-    if (perm === 'granted') reg.active?.postMessage('app-opened');
-  });
-  $('notif-no').addEventListener('click', () => {
-    banner.remove();
-    localStorage.setItem('notif-dismissed', '1');
-  });
-}
-
-// ── Init ───────────────────────────────────────────────
-loadState();
-updateHomeStats();
-showScreen('home');
-initNotifications();
+</script>
+</body>
+</html>
