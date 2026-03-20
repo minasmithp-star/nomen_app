@@ -299,18 +299,20 @@ function rate(level) {
   $('rating-row').classList.remove('visible');
 
   const flip = $('card-flip');
+  const back = $('card-flip').querySelector('.card-face-back');
 
-  // Estamos en 180deg (reverso visible). Continuamos a 360deg (frente visible).
-  // A mitad del segundo giro (270deg) cargamos el contenido nuevo — invisible por estar de canto.
+  // Ocultamos el reverso inmediatamente — así durante el giro no se ve el contenido viejo
+  back.style.visibility = 'hidden';
+
+  // Continuamos de 180° → 360° (frente de la siguiente tarjeta)
   flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
   flip.style.transform  = 'rotateY(360deg)';
 
-  // A los 150ms (mitad del flip) actualizamos el contenido — la tarjeta está de canto, no se ve nada
+  // A los 150ms cargamos el contenido nuevo (tarjeta de canto, invisible de todas formas)
   setTimeout(() => {
     session.index++;
     const next = session.queue[session.index];
-    if (!next) return; // showResults se llama al terminar la animación
-    // Cargamos sin animación de entrada (ya hay animación de flip)
+    if (!next) return;
     const c = getAccent(next);
     document.documentElement.style.setProperty('--accent',    c.a);
     document.documentElement.style.setProperty('--accent-bg', c.bg);
@@ -326,16 +328,16 @@ function rate(level) {
     $('progress-fill').style.width  = pct + '%';
     $('progress-label').textContent = `${session.index + 1} / ${session.queue.length}`;
     $('streak-badge').textContent   = `❤︎ ${state.streak}`;
+    // Restaurar visibilidad del reverso para el próximo flip
+    back.style.visibility = 'visible';
   }, 150);
 
-  // Al terminar el flip (400ms) reseteamos transform para que el próximo flip salga bien
+  // Al terminar el flip reseteamos transform
   setTimeout(() => {
     if (!session.queue[session.index]) { showResults(); return; }
-    // Reset instantáneo sin transición — la tarjeta ya está en posición 0 visualmente
     flip.style.transition = 'none';
     flip.style.transform  = 'rotateY(0deg)';
     session.isFlipped = false;
-    // Restaurar transición para el próximo flip manual
     requestAnimationFrame(() => {
       flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
     });
