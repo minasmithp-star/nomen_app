@@ -297,7 +297,7 @@ function rate(level) {
   setTimeout(() => {
     session.index++;
     _fillCard(session.queue[session.index]);
-  }, 400);
+  }, 300);
 }
 
 $('btn-back').addEventListener('click', () => { showScreen('home'); updateHomeStats(); });
