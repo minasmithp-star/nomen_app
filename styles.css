@@ -362,3 +362,63 @@ body {
   #screen-home { padding-top: 64px; }
   .card-scene { height: 310px; }
 }
+
+/* ── Stats bar extra ──────────────────── */
+.stat tiny { font-size: .6rem; color: var(--muted); display: block; text-align: center; }
+.stat tiny b { color: var(--accent); }
+
+/* ── Results extras ───────────────────── */
+.results-streak-box {
+  width: 100%;
+  background: var(--pastel-pink);
+  border: 2px solid #fbcfe8;
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.rsb-main {
+  font-size: 1.5rem; font-family: var(--font-mono);
+  font-weight: 600; color: #be185d;
+}
+.rsb-sub { font-size: .78rem; color: var(--muted); }
+.rsb-sub span { color: var(--accent); font-weight: 600; }
+
+/* ── History chart ────────────────────── */
+.chart-wrap {
+  width: 100%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px 10px;
+}
+.chart-title {
+  font-size: .7rem; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--muted);
+  margin-bottom: 10px; font-family: var(--font-mono);
+}
+.history-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 80px;
+}
+.chart-bar-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end; gap: 4px;
+  height: 100%;
+}
+.chart-bar {
+  width: 100%; border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height .4s ease;
+}
+.chart-label {
+  font-size: .6rem; color: var(--muted);
+  font-family: var(--font-mono);
+}
+.chart-empty {
+  font-size: .75rem; color: var(--muted);
+  font-style: italic; text-align: center;
+  width: 100%; padding: 16px 0;
+}
