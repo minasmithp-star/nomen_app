@@ -2,21 +2,39 @@
 
 const STATE_KEY = 'nomen-v3';
 
-// ── Colores por subgrupo ───────────────────────────────
+// ── Colores HexNote por subgrupo ───────────────────────
+// Cada color define accent, accent-bg y accent-b (borde)
 const SECTION_COLORS = {
-  poliatómicos: '#8b5cf6', monoatómicos: '#06b6d4',
-  cationes:     '#f97316', hidrácido:    '#10b981',
-  oxoácido:     '#f59e0b', halógenos:    '#ec4899',
-  azufre:       '#84cc16', nitrógeno:    '#6366f1',
-  fósforo:      '#14b8a6', cromo:        '#ef4444',
-  manganeso:    '#a855f7', oxígeno:      '#3b82f6',
-  carbono:      '#64748b', arsénico:     '#d97706',
-  boro:         '#22c55e', default:      '#a78bfa',
+  // Aniones — por subgrupo
+  halógenos:    { a: '#7d6fb0', bg: '#ebe7f5', b: '#c8c0e8' }, // lavanda
+  azufre:       { a: '#c4685a', bg: '#f5e2de', b: '#ddb0a8' }, // coral
+  nitrógeno:    { a: '#4a8c85', bg: '#dff0ee', b: '#b0d8d4' }, // teal
+  fósforo:      { a: '#5c8a65', bg: '#e8f0e9', b: '#b8d4bc' }, // sage
+  oxígeno:      { a: '#5a7aaa', bg: '#e2eaf5', b: '#b8cce8' }, // azul slate
+  cromo:        { a: '#9a7840', bg: '#f2e8d4', b: '#d4c090' }, // ochre
+  manganeso:    { a: '#8060a0', bg: '#ede8f5', b: '#c8b8e0' }, // púrpura
+  carbono:      { a: '#5a6a7a', bg: '#e2e8ee', b: '#b8c8d8' }, // slate
+  arsénico:     { a: '#9a6848', bg: '#f2e4d8', b: '#d4b8a0' }, // terracota
+  boro:         { a: '#4a8860', bg: '#dff0e8', b: '#a8d4b8' }, // verde esmeralda
+  // Poliatómicos / monoatómicos sin subgrupo especial
+  poliatómicos: { a: '#7d6fb0', bg: '#ebe7f5', b: '#c8c0e8' },
+  monoatómicos: { a: '#4a8c85', bg: '#dff0ee', b: '#b0d8d4' },
+  // Cationes
+  cationes:     { a: '#b8883a', bg: '#f5ead4', b: '#d4b878' }, // ámbar
+  // Ácidos
+  hidrácido:    { a: '#b06080', bg: '#f5e0ea', b: '#e0b8cc' }, // rosa
+  oxoácido:     { a: '#b06080', bg: '#f5e0ea', b: '#e0b8cc' }, // rosa
+  // Default
+  default:      { a: '#5c8a65', bg: '#e8f0e9', b: '#b8d4bc' },
 };
+
 function getAccent(card) {
-  if (card.subgrupo && SECTION_COLORS[card.subgrupo]) return SECTION_COLORS[card.subgrupo];
-  if (card.tipo && SECTION_COLORS[card.tipo]) return SECTION_COLORS[card.tipo];
-  return SECTION_COLORS.default;
+  const key = (card.subgrupo && SECTION_COLORS[card.subgrupo])
+    ? card.subgrupo
+    : (card.tipo && SECTION_COLORS[card.tipo])
+    ? card.tipo
+    : 'default';
+  return SECTION_COLORS[key];
 }
 
 // ── Estado persistente ─────────────────────────────────
@@ -176,9 +194,10 @@ function renderCard() {
 function _fillCard(card) {
   if (!card) { showResults(); return; }
 
-  const accent = getAccent(card);
-  document.documentElement.style.setProperty('--accent', accent);
-  document.documentElement.style.setProperty('--accent-bg', accent + '18');
+  const c = getAccent(card);
+  document.documentElement.style.setProperty('--accent',    c.a);
+  document.documentElement.style.setProperty('--accent-bg', c.bg);
+  document.documentElement.style.setProperty('--accent-b',  c.b);
 
   const pct = (session.index / session.queue.length) * 100;
   $('progress-fill').style.width = pct + '%';
@@ -278,7 +297,7 @@ function rate(level) {
   setTimeout(() => {
     session.index++;
     _fillCard(session.queue[session.index]);
-  }, 450);
+  }, 400);
 }
 
 $('btn-back').addEventListener('click', () => { showScreen('home'); updateHomeStats(); });
@@ -320,7 +339,10 @@ function showResults() {
   // Gráfico de barras
   renderHistoryChart();
 
-  document.documentElement.style.setProperty('--accent', '#a78bfa');
+  const def = SECTION_COLORS.default;
+  document.documentElement.style.setProperty('--accent',    def.a);
+  document.documentElement.style.setProperty('--accent-bg', def.bg);
+  document.documentElement.style.setProperty('--accent-b',  def.b);
   showScreen('results');
   updateHomeStats();
 }
@@ -352,7 +374,7 @@ function renderHistoryChart() {
     const bar = document.createElement('div');
     bar.className = 'chart-bar-wrap';
     const height = Math.max(8, s.pct);
-    const color = s.pct >= 80 ? '#86efac' : s.pct >= 50 ? '#fde68a' : '#fca5a5';
+    const color = s.pct >= 80 ? '#a8c8ac' : s.pct >= 50 ? '#c8bce0' : '#ddb0a8';
     bar.innerHTML = `
       <div class="chart-bar" style="height:${height}%; background:${color};" title="${s.pct}%"></div>
       <span class="chart-label">${s.pct}%</span>`;
