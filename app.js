@@ -269,7 +269,7 @@ function buildDetails(card, mode) {
 function handleFlip() {
   const flip = $('card-flip');
   session.isFlipped = !session.isFlipped;
-  flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
+  flip.style.transition = 'transform .55s cubic-bezier(.6,0,.2,1)';
   flip.style.transform  = session.isFlipped ? 'rotateY(-180deg)' : 'rotateY(0deg)';
   if (session.isFlipped) $('rating-row').classList.add('visible');
   else $('rating-row').classList.remove('visible');
@@ -293,28 +293,21 @@ function rate(level) {
   // Ocultar botones
   $('rating-row').classList.remove('visible');
 
-  // ── Estrategia limpia ──────────────────────────────────
-  // 1. La tarjeta está en -180deg (reverso visible)
-  // 2. Continuamos a -360deg — durante la primera mitad (0→90deg de este tramo)
-  //    el reverso todavía es visible (bien)
-  // 3. A los 200ms (tarjeta de canto) cargamos el frente de la nueva tarjeta
-  //    y ocultamos el reverso viejo
-  // 4. La segunda mitad del flip muestra el frente nuevo
-
-  const flip = $('card-flip');
+  const flip  = $('card-flip');
   const back  = flip.querySelector('.card-face-back');
   const front = flip.querySelector('.card-face-front');
 
-  flip.style.transition = 'transform .5s cubic-bezier(.4,0,.2,1)';
+  // Flip continuo -180° → -360°
+  // Curva: arranca rápido (sale el reverso) y desacelera al llegar al frente nuevo
+  flip.style.transition = 'transform .55s cubic-bezier(.6,0,.2,1)';
   flip.style.transform  = 'rotateY(-360deg)';
 
+  // A los 220ms la tarjeta está de canto — swap invisible
   setTimeout(() => {
-    // Tarjeta de canto — cargamos la nueva sin que se vea
     session.index++;
     const next = session.queue[session.index];
     if (!next) return;
 
-    // Ocultar reverso viejo, mostrar frente nuevo
     back.style.visibility  = 'hidden';
     front.style.visibility = 'visible';
 
@@ -322,6 +315,7 @@ function rate(level) {
     document.documentElement.style.setProperty('--accent',    c.a);
     document.documentElement.style.setProperty('--accent-bg', c.bg);
     document.documentElement.style.setProperty('--accent-b',  c.b);
+
     const groupText = buildGroupLabel(next);
     $('card-group-label').textContent      = groupText;
     $('card-group-label-back').textContent = groupText;
@@ -329,23 +323,24 @@ function rate(level) {
     $('card-question').textContent = q.question;
     $('card-answer').textContent   = q.answer;
     buildDetails(next, session.mode);
+
     const pct = (session.index / session.queue.length) * 100;
     $('progress-fill').style.width  = pct + '%';
     $('progress-label').textContent = `${session.index + 1} / ${session.queue.length}`;
     $('streak-badge').textContent   = `❤︎ ${state.streak}`;
-  }, 200);
+  }, 220);
 
-  // Al terminar el flip: resetear todo
+  // Al terminar: reset limpio
   setTimeout(() => {
     if (!session.queue[session.index]) { showResults(); return; }
-    flip.style.transition  = 'none';
-    flip.style.transform   = 'rotateY(0deg)';
-    back.style.visibility  = 'visible';
+    flip.style.transition = 'none';
+    flip.style.transform  = 'rotateY(0deg)';
+    back.style.visibility = 'visible';
     session.isFlipped = false;
     requestAnimationFrame(() => {
-      flip.style.transition = 'transform .5s cubic-bezier(.4,0,.2,1)';
+      flip.style.transition = 'transform .55s cubic-bezier(.6,0,.2,1)';
     });
-  }, 520);
+  }, 560);
 
   // Al terminar el flip reseteamos transform
   setTimeout(() => {
