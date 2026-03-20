@@ -15,10 +15,10 @@ const ASSETS = [
 
 const NOTIF_DELAY_MS = 20 * 60 * 60 * 1000; // 20 horas
 const NOTIF_MESSAGES = [
-  { title: '🔥 ¡Tu racha está en riesgo!', body: 'Practicá Nomen hoy y no pierdas tu racha.' },
-  { title: '⚗️ Nomen te espera', body: '5 minutos de nomenclatura y mantenés la racha.' },
-  { title: '🧪 ¿SO₄²⁻ o SO₃²⁻?', body: 'Abrí Nomen y repasá antes de que se acabe el día.' },
-  { title: '📖 Hora de repasar', body: 'No dejes que los aniones se te olviden. Abrí Nomen.' },
+  { title: '¡Tu racha está en riesgo!', body: 'Practicá Nomen hoy y no pierdas tu racha.' },
+  { title: '⚛︎ Nomen te espera', body: '5 minutos de nomenclatura y mantenés la racha.' },
+  { title: '⌬ ¿SO₄²⁻ o SO₃²⁻?', body: 'Abrí Nomen y repasá antes de que se acabe el día.' },
+  { title: '🕮 Hora de repasar', body: 'No dejes que los aniones se te olviden. Abrí Nomen.' },
 ];
 
 let notifTimer = null;
