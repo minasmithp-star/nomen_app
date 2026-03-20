@@ -214,11 +214,6 @@ function _fillCard(card) {
   $('card-question').textContent = q.question;
   $('card-answer').textContent   = q.answer;
   buildDetails(card, session.mode);
-
-  const scene = $('card-scene');
-  scene.style.animation = 'none';
-  scene.offsetHeight;
-  scene.style.animation = '';
 }
 
 function buildGroupLabel(card) {
