@@ -134,17 +134,26 @@ function renderCard() {
   const card = session.queue[session.index];
   if (!card) { showResults(); return; }
 
-  // Reset flip
-  session.isFlipped = false;
   const flip = $('card-flip');
-  flip.classList.remove('flipped');
-  $('rating-row').classList.remove('visible');
 
+  // Si la tarjeta está volteada, primero la giramos de vuelta
+  // y actualizamos el contenido DESPUÉS de que termine la animación
+  // para que nunca se vea la respuesta de la siguiente
+  if (session.isFlipped) {
+    flip.classList.remove('flipped');
+    $('rating-row').classList.remove('visible');
+    session.isFlipped = false;
+    setTimeout(() => _fillCard(card), 300); // esperar que termine el flip (.55s → usamos 300 para que no se vea)
+  } else {
+    _fillCard(card);
+  }
+}
+
+function _fillCard(card) {
   // Accent color
   const accent = getAccent(card);
   document.documentElement.style.setProperty('--accent', accent);
-  document.documentElement.style.setProperty('--accent-bg',
-    accent + '18'); // ~10% opacity hex trick
+  document.documentElement.style.setProperty('--accent-bg', accent + '18');
 
   // Progress
   const pct = (session.index / session.queue.length) * 100;
@@ -165,7 +174,7 @@ function renderCard() {
   // Details on back
   buildDetails(card, session.mode);
 
-  // Re-trigger animation
+  // Re-trigger entry animation
   const scene = $('card-scene');
   scene.style.animation = 'none';
   scene.offsetHeight;
