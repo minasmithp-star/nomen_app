@@ -186,7 +186,9 @@ function renderCard() {
   const card = session.queue[session.index];
   if (!card) { showResults(); return; }
   session.isFlipped = false;
-  $('card-flip').classList.remove('flipped');
+  const flip = $('card-flip');
+  flip.style.transition = 'none';
+  flip.style.transform  = 'rotateY(0deg)';
   $('rating-row').classList.remove('visible');
   _fillCard(card);
 }
@@ -268,11 +270,14 @@ function buildDetails(card, mode) {
   });
 }
 
-// ── Flip ───────────────────────────────────────────────
+// ── Flip manual (toca la tarjeta) ──────────────────────
 function handleFlip() {
+  const flip = $('card-flip');
   session.isFlipped = !session.isFlipped;
-  $('card-flip').classList.toggle('flipped', session.isFlipped);
+  flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
+  flip.style.transform  = session.isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
   if (session.isFlipped) $('rating-row').classList.add('visible');
+  else $('rating-row').classList.remove('visible');
 }
 
 // ── Rating ─────────────────────────────────────────────
@@ -290,14 +295,51 @@ function rate(level) {
   }
   saveState();
 
+  // Ocultar botones
   $('rating-row').classList.remove('visible');
-  $('card-flip').classList.remove('flipped');
-  session.isFlipped = false;
 
+  const flip = $('card-flip');
+
+  // Estamos en 180deg (reverso visible). Continuamos a 360deg (frente visible).
+  // A mitad del segundo giro (270deg) cargamos el contenido nuevo — invisible por estar de canto.
+  flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
+  flip.style.transform  = 'rotateY(360deg)';
+
+  // A los 200ms (mitad del flip) actualizamos el contenido — la tarjeta está de canto, no se ve nada
   setTimeout(() => {
     session.index++;
-    _fillCard(session.queue[session.index]);
-  }, 300);
+    const next = session.queue[session.index];
+    if (!next) return; // showResults se llama al terminar la animación
+    // Cargamos sin animación de entrada (ya hay animación de flip)
+    const c = getAccent(next);
+    document.documentElement.style.setProperty('--accent',    c.a);
+    document.documentElement.style.setProperty('--accent-bg', c.bg);
+    document.documentElement.style.setProperty('--accent-b',  c.b);
+    const groupText = buildGroupLabel(next);
+    $('card-group-label').textContent      = groupText;
+    $('card-group-label-back').textContent = groupText;
+    const q = buildQuestion(next, session.mode);
+    $('card-question').textContent = q.question;
+    $('card-answer').textContent   = q.answer;
+    buildDetails(next, session.mode);
+    const pct = (session.index / session.queue.length) * 100;
+    $('progress-fill').style.width  = pct + '%';
+    $('progress-label').textContent = `${session.index + 1} / ${session.queue.length}`;
+    $('streak-badge').textContent   = `❤︎ ${state.streak}`;
+  }, 200);
+
+  // Al terminar el flip (400ms) reseteamos transform para que el próximo flip salga bien
+  setTimeout(() => {
+    if (!session.queue[session.index]) { showResults(); return; }
+    // Reset instantáneo sin transición — la tarjeta ya está en posición 0 visualmente
+    flip.style.transition = 'none';
+    flip.style.transform  = 'rotateY(0deg)';
+    session.isFlipped = false;
+    // Restaurar transición para el próximo flip manual
+    requestAnimationFrame(() => {
+      flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
+    });
+  }, 410);
 }
 
 $('btn-back').addEventListener('click', () => { showScreen('home'); updateHomeStats(); });
