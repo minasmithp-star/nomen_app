@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nomen</title>
   <meta name="description" content="Flashcards de nomenclatura para Química Inorgánica" />
-  <meta name="theme-color" content="#4f7cff" />
+  <meta name="theme-color" content="#a78bfa" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,29 +24,7 @@
       <p class="subtitle">Nomenclatura · Química Inorgánica</p>
     </header>
 
-    <nav class="mode-grid">
-      <button class="mode-card selected" data-mode="nombre-formula">
-        <span class="mode-icon">𝑓(x)</span>
-        <span class="mode-label">Nombre → Fórmula</span>
-        <span class="mode-desc">Ver el nombre, recordar la fórmula</span>
-      </button>
-      <button class="mode-card" data-mode="formula-nombre">
-        <span class="mode-icon">αβ</span>
-        <span class="mode-label">Fórmula → Nombre</span>
-        <span class="mode-desc">Ver la fórmula, recordar el nombre</span>
-      </button>
-      <button class="mode-card" data-mode="carga">
-        <span class="mode-icon">±</span>
-        <span class="mode-label">Carga & Oxidación</span>
-        <span class="mode-desc">Identificar la carga del ion</span>
-      </button>
-      <button class="mode-card" data-mode="sales">
-        <span class="mode-icon">→</span>
-        <span class="mode-label">Sales que forma</span>
-        <span class="mode-desc">Completar el nombre de la sal</span>
-      </button>
-    </nav>
-
+    <!-- FILTROS — primero -->
     <section class="set-selector">
       <p class="set-label">Sección</p>
       <div class="section-tabs">
@@ -75,10 +53,47 @@
       </div>
     </section>
 
+    <!-- MODOS — después -->
+    <nav class="mode-grid">
+      <button class="mode-card selected" data-mode="nombre-formula">
+        <span class="mode-icon">𝑓(x)</span>
+        <span class="mode-label">Nombre → Fórmula</span>
+        <span class="mode-desc">Ver el nombre, recordar la fórmula</span>
+      </button>
+      <button class="mode-card" data-mode="formula-nombre">
+        <span class="mode-icon">αβ</span>
+        <span class="mode-label">Fórmula → Nombre</span>
+        <span class="mode-desc">Ver la fórmula, recordar el nombre</span>
+      </button>
+      <button class="mode-card" data-mode="carga">
+        <span class="mode-icon">±</span>
+        <span class="mode-label">Carga & Oxidación</span>
+        <span class="mode-desc">Identificar la carga del ion</span>
+      </button>
+      <button class="mode-card" data-mode="sales">
+        <span class="mode-icon">→</span>
+        <span class="mode-label">Sales que forma</span>
+        <span class="mode-desc">Completar el nombre de la sal</span>
+      </button>
+    </nav>
+
+    <!-- STATS — racha de días visible -->
     <div class="stats-bar">
-      <div class="stat"><span id="stat-total">0</span><small>total</small></div>
-      <div class="stat"><span id="stat-learned">0</span><small>aprendidas</small></div>
-      <div class="stat"><span id="stat-streak">0</span><small>racha</small></div>
+      <div class="stat">
+        <span id="stat-streak">0</span>
+        <small>racha</small>
+        <tiny>días</tiny>
+      </div>
+      <div class="stat">
+        <span id="stat-best">0</span>
+        <small>mejor</small>
+        <tiny>racha</tiny>
+      </div>
+      <div class="stat">
+        <span id="stat-learned">0</span>
+        <small>aprendidas</small>
+        <tiny>de <b id="stat-total">0</b></tiny>
+      </div>
     </div>
 
     <button class="btn-primary" id="btn-start">Comenzar sesión</button>
@@ -97,7 +112,6 @@
     </div>
 
     <div class="card-arena">
-      <!-- 3D Flip card -->
       <div class="card-scene" id="card-scene" onclick="handleFlip()">
         <div class="card-flip" id="card-flip">
           <div class="card-face card-face-front">
@@ -113,10 +127,9 @@
         </div>
       </div>
 
-      <!-- Rating buttons -->
       <div class="rating-row" id="rating-row">
-        <button class="rate-btn rate-hard" onclick="rate('hard')">✗ No sabía</button>
-        <button class="rate-btn rate-ok"   onclick="rate('ok')">~ Regular</button>
+        <button class="rate-btn rate-hard" onclick="rate('hard')">✕ No sabía</button>
+        <button class="rate-btn rate-ok"   onclick="rate('ok')">— Regular</button>
         <button class="rate-btn rate-easy" onclick="rate('easy')">✓ Lo sabía</button>
       </div>
     </div>
@@ -125,15 +138,33 @@
   <!-- SCREEN: Results -->
   <div id="screen-results" class="screen">
     <div class="results-inner">
-      <div class="results-icon" id="results-icon"></div>
+      <div class="results-icon" id="results-icon">◈</div>
       <h2 id="results-title">Sesión completa</h2>
       <p id="results-msg"></p>
+
+      <!-- Stats de sesión -->
       <div class="results-stats">
-        <div class="rstat"><span id="r-correct"></span><small>fácil</small></div>
-        <div class="rstat"><span id="r-wrong"></span><small>difícil</small></div>
+        <div class="rstat"><span id="r-correct"></span><small>lo sabía</small></div>
+        <div class="rstat"><span id="r-wrong"></span><small>no sabía</small></div>
         <div class="rstat"><span id="r-pct"></span><small>precisión</small></div>
       </div>
-      <button class="btn-primary" id="btn-review">Repasar difíciles</button>
+
+      <!-- Racha de días -->
+      <div class="results-streak-box">
+        <div class="rsb-main" id="results-streak">❤︎ 0 días</div>
+        <div class="rsb-sub">
+          <span id="results-learned">0</span> iones aprendidos ·
+          <span id="results-best">mejor: 0</span>
+        </div>
+      </div>
+
+      <!-- Gráfico de historial -->
+      <div class="chart-wrap">
+        <p class="chart-title">Últimas sesiones</p>
+        <div class="history-chart" id="history-chart"></div>
+      </div>
+
+      <button class="btn-primary" id="btn-review">Repasar los que fallé</button>
       <button class="btn-ghost"   id="btn-home">Volver al inicio</button>
     </div>
   </div>
