@@ -270,7 +270,7 @@ function handleFlip() {
   const flip = $('card-flip');
   session.isFlipped = !session.isFlipped;
   flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
-  flip.style.transform  = session.isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
+  flip.style.transform  = session.isFlipped ? 'rotateY(-180deg)' : 'rotateY(0deg)';
   if (session.isFlipped) $('rating-row').classList.add('visible');
   else $('rating-row').classList.remove('visible');
 }
@@ -301,7 +301,7 @@ function rate(level) {
 
   // Continuamos de 180° → 360° (frente de la siguiente tarjeta)
   flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
-  flip.style.transform  = 'rotateY(360deg)';
+  flip.style.transform  = 'rotateY(-360deg)';
 
   // A los 150ms cargamos el contenido nuevo (tarjeta de canto, invisible de todas formas)
   setTimeout(() => {
