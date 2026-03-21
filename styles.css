@@ -160,7 +160,20 @@ body {
 }
 .notif-actions button:first-child { background: var(--sage); color: #fff; border-color: var(--sage); }
 
-/* ── QUIZ ─────────────────────────────── */
+/* Count selector */
+.count-selector { display: flex; flex-direction: column; gap: 8px; }
+.count-tabs {
+  display: flex; gap: 8px;
+}
+.count-tab {
+  flex: 1; padding: 8px 4px; border-radius: var(--radius);
+  border: 1.5px solid var(--border); background: var(--surface);
+  font-size: .82rem; font-family: var(--font-sans); font-weight: 500;
+  cursor: pointer; color: var(--muted); transition: all var(--transition);
+  text-align: center;
+}
+.count-tab:hover { border-color: var(--sage); color: var(--sage); }
+.count-tab.active { border-color: var(--sage); background: var(--sage); color: #fff; }
 #screen-quiz { background: var(--bg); flex: 1; }
 
 .quiz-topbar {
