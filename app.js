@@ -20,7 +20,14 @@ const SECTION_COLORS = {
   poliatómicos: { a: '#7d6fb0', bg: '#ebe7f5', b: '#c8c0e8' },
   monoatómicos: { a: '#4a8c85', bg: '#dff0ee', b: '#b0d8d4' },
   // Cationes
-  cationes:     { a: '#b8883a', bg: '#f5ead4', b: '#d4b878' }, // ámbar
+  cationes:         { a: '#b8883a', bg: '#f5ead4', b: '#d4b878' }, // ámbar
+  'poliatómicos-c': { a: '#b8883a', bg: '#f5ead4', b: '#d4b878' },
+  alcalinos:        { a: '#5a7aaa', bg: '#e2eaf5', b: '#b8cce8' }, // azul slate
+  alcalinotérreos:  { a: '#4a8c85', bg: '#dff0ee', b: '#b0d8d4' }, // teal
+  transición:       { a: '#8060a0', bg: '#ede8f5', b: '#c8b8e0' }, // púrpura
+  principales:      { a: '#9a7840', bg: '#f2e8d4', b: '#d4c090' }, // ochre
+  lantánidos:       { a: '#b06080', bg: '#f5e0ea', b: '#e0b8cc' }, // rosa
+  hidrógeno:        { a: '#5c8a65', bg: '#e8f0e9', b: '#b8d4bc' }, // sage
   // Ácidos
   hidrácido:    { a: '#b06080', bg: '#f5e0ea', b: '#e0b8cc' }, // rosa
   oxoácido:     { a: '#b06080', bg: '#f5e0ea', b: '#e0b8cc' }, // rosa
@@ -153,8 +160,24 @@ document.querySelectorAll('.set-tab').forEach(tab => {
   });
 });
 
+// ── Count selector ─────────────────────────────────────
+let selectedCount = 'all';
+
+document.querySelectorAll('.count-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.count-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedCount = tab.dataset.count;
+  });
+});
+
 $('btn-start').addEventListener('click', () => {
-  const pool = GRUPOS[selectedSet] || TODOS;
+  let pool = GRUPOS[selectedSet] || TODOS;
+  // Aplicar límite de cantidad
+  if (selectedCount !== 'all') {
+    const n = parseInt(selectedCount);
+    pool = shuffle([...pool]).slice(0, n);
+  }
   startSession(selectedMode, pool);
 });
 
