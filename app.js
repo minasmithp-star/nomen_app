@@ -1,7 +1,5 @@
 // app.js — Nomen · v3 · racha por días, progreso, mensajes personalizados
 
-import { saveToCloud, loadFromCloud, subscribeToCloud } from './firebase.js';
-
 const STATE_KEY = 'nomen-v3';
 
 // ── Colores HexNote por subgrupo ───────────────────────
@@ -73,10 +71,10 @@ let cloudSyncEnabled = false;
 let unsubscribeCloud = null;
 
 function saveState() {
-  // Siempre guardar local como fallback
   try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch {}
-  // Guardar en cloud si está disponible
-  if (cloudSyncEnabled) saveToCloud(state).catch(() => {});
+  if (cloudSyncEnabled && window._saveToCloud) {
+    window._saveToCloud(state).catch(() => {});
+  }
 }
 
 function loadState() {
@@ -90,25 +88,30 @@ function loadState() {
 
 async function initCloudSync() {
   try {
+    // Import dinámico — si falla no rompe el resto de la app
+    const fb = await import('./firebase.js');
+    const { saveToCloud, loadFromCloud, subscribeToCloud } = fb;
+
     const cloudState = await loadFromCloud();
     if (cloudState) {
-      // Usar el estado más reciente (comparar fecha de última sesión)
-      const localDate  = state.lastSessionDate || '';
-      const cloudDate  = cloudState.lastSessionDate || '';
+      const localDate = state.lastSessionDate || '';
+      const cloudDate = cloudState.lastSessionDate || '';
       if (cloudDate >= localDate) {
         state = { ...state, ...cloudState };
         if (!state.history) state.history = [];
-        saveState(); // sincronizar local con cloud
+        try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch {}
         updateHomeStats();
       }
     }
     cloudSyncEnabled = true;
 
-    // Escuchar cambios en tiempo real (otro dispositivo guardó)
-    unsubscribeCloud = subscribeToCloud((cloudState) => {
+    // Sobreescribir saveState para que también guarde en cloud
+    const _saveLocal = saveState;
+    window._saveToCloud = saveToCloud;
+
+    subscribeToCloud((cloudState) => {
       const localDate = state.lastSessionDate || '';
       const cloudDate = cloudState.lastSessionDate || '';
-      // Solo actualizar si el cloud tiene datos más nuevos y no hay sesión activa
       if (cloudDate > localDate) {
         state = { ...state, ...cloudState };
         if (!state.history) state.history = [];
@@ -120,7 +123,7 @@ async function initCloudSync() {
 
     showSyncStatus('connected');
   } catch (e) {
-    console.warn('Cloud sync unavailable, using local storage', e);
+    console.warn('Cloud sync unavailable:', e);
     showSyncStatus('offline');
   }
 }
