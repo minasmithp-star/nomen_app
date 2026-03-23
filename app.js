@@ -65,15 +65,78 @@ let session = {
   isFlipped: false,
 };
 
-function saveState() { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch {} }
+// ── Firebase sync ──────────────────────────────────────
+import { saveToCloud, loadFromCloud, subscribeToCloud } from './firebase.js';
+
+let cloudSyncEnabled = false;
+let unsubscribeCloud = null;
+
+function saveState() {
+  // Siempre guardar local como fallback
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch {}
+  // Guardar en cloud si está disponible
+  if (cloudSyncEnabled) saveToCloud(state).catch(() => {});
+}
+
 function loadState() {
   try {
     const s = localStorage.getItem(STATE_KEY);
     if (s) state = { ...state, ...JSON.parse(s) };
-    // Migrar desde versión anterior sin history
     if (!state.history) state.history = [];
     if (!state.lastSessionDate) state.lastSessionDate = null;
   } catch {}
+}
+
+async function initCloudSync() {
+  try {
+    const cloudState = await loadFromCloud();
+    if (cloudState) {
+      // Usar el estado más reciente (comparar fecha de última sesión)
+      const localDate  = state.lastSessionDate || '';
+      const cloudDate  = cloudState.lastSessionDate || '';
+      if (cloudDate >= localDate) {
+        state = { ...state, ...cloudState };
+        if (!state.history) state.history = [];
+        saveState(); // sincronizar local con cloud
+        updateHomeStats();
+      }
+    }
+    cloudSyncEnabled = true;
+
+    // Escuchar cambios en tiempo real (otro dispositivo guardó)
+    unsubscribeCloud = subscribeToCloud((cloudState) => {
+      const localDate = state.lastSessionDate || '';
+      const cloudDate = cloudState.lastSessionDate || '';
+      // Solo actualizar si el cloud tiene datos más nuevos y no hay sesión activa
+      if (cloudDate > localDate) {
+        state = { ...state, ...cloudState };
+        if (!state.history) state.history = [];
+        try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch {}
+        updateHomeStats();
+        showSyncBadge();
+      }
+    });
+
+    showSyncStatus('connected');
+  } catch (e) {
+    console.warn('Cloud sync unavailable, using local storage', e);
+    showSyncStatus('offline');
+  }
+}
+
+function showSyncBadge() {
+  const badge = document.createElement('div');
+  badge.className = 'sync-badge';
+  badge.textContent = '↓ Sincronizado';
+  document.body.appendChild(badge);
+  setTimeout(() => badge.remove(), 2500);
+}
+
+function showSyncStatus(status) {
+  const el = $('sync-status');
+  if (!el) return;
+  el.textContent = status === 'connected' ? '● sincronizado' : '○ sin conexión';
+  el.style.color  = status === 'connected' ? 'var(--sage)' : 'var(--muted)';
 }
 
 // ── Racha por días consecutivos ────────────────────────
@@ -493,3 +556,4 @@ loadState();
 updateHomeStats();
 showScreen('home');
 initNotifications();
+initCloudSync();
