@@ -418,3 +418,119 @@ body {
   #screen-home { padding-top: 64px; }
   .card-scene  { height: 310px; }
 }
+
+/* ── Periodic table button ────────────────────────────── */
+.home-header { position: relative; }
+
+.pt-btn {
+  position: absolute;
+  top: 0; right: 0;
+  width: 40px; height: 40px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--sage);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+  box-shadow: var(--shadow);
+}
+.pt-btn:hover { background: var(--sage-bg); border-color: var(--sage); }
+
+/* ── Periodic table modal ─────────────────────────────── */
+.pt-overlay {
+  position: fixed; inset: 0;
+  background: rgba(40,35,20,.45);
+  z-index: 100;
+  display: flex; align-items: flex-end;
+  backdrop-filter: blur(2px);
+  animation: fade-up .2s ease;
+}
+.pt-overlay.hidden { display: none !important; }
+
+.pt-modal {
+  width: 100%; max-height: 92dvh;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 0 0 env(safe-area-inset-bottom, 16px);
+  display: flex; flex-direction: column;
+  animation: slide-up .25s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.pt-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1.5px solid var(--border);
+  flex-shrink: 0;
+}
+.pt-modal-title { font-size: 1rem; font-weight: 500; color: var(--text); }
+.pt-close {
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1.5px solid var(--border); background: transparent;
+  font-size: .8rem; cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition);
+}
+.pt-close:hover { background: var(--border); }
+
+.pt-legend {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  padding: 10px 16px;
+  border-bottom: 1.5px solid var(--border);
+  flex-shrink: 0;
+}
+.pt-leg {
+  font-size: .65rem; padding: 3px 8px; border-radius: 20px;
+  background: color-mix(in srgb, var(--lc) 18%, white);
+  color: var(--lc); border: 1px solid color-mix(in srgb, var(--lc) 35%, white);
+  font-weight: 500;
+}
+
+.pt-scroll {
+  overflow-x: auto; overflow-y: auto;
+  padding: 12px 10px 20px;
+  flex: 1;
+}
+
+/* Grid de la tabla */
+.pt-table {
+  display: grid;
+  grid-template-columns: repeat(18, minmax(34px, 1fr));
+  gap: 3px;
+  min-width: 620px;
+}
+
+.pt-cell {
+  border-radius: 6px;
+  padding: 3px 2px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 38px;
+  cursor: default;
+  border: 1px solid transparent;
+  transition: transform .15s ease;
+}
+.pt-cell:hover { transform: scale(1.12); z-index: 2; }
+.pt-cell.empty { background: transparent; border: none; pointer-events: none; }
+
+.pt-num  { font-size: .5rem; color: inherit; opacity: .7; line-height: 1; }
+.pt-sym  { font-size: .85rem; font-weight: 600; color: inherit; line-height: 1.1; }
+.pt-name { font-size: .38rem; color: inherit; opacity: .75; line-height: 1; text-align: center; }
+
+/* Colores por categoría */
+.pt-alkali      { background: var(--slate-bg);  color: var(--slate);  border-color: var(--slate-b); }
+.pt-alkaline    { background: var(--teal-bg);   color: var(--teal);   border-color: var(--teal-b); }
+.pt-transition  { background: var(--lav-bg);    color: var(--lav);    border-color: var(--lav-b); }
+.pt-post        { background: var(--ochre-bg);  color: var(--ochre);  border-color: var(--ochre-b); }
+.pt-metalloid   { background: var(--amber-bg);  color: var(--amber);  border-color: var(--amber-b); }
+.pt-nonmetal    { background: var(--coral-bg);  color: var(--coral);  border-color: var(--coral-b); }
+.pt-halogen     { background: var(--rose-bg);   color: var(--rose);   border-color: var(--rose-b); }
+.pt-noble       { background: var(--slate-bg);  color: var(--slate);  border-color: var(--slate-b); }
+.pt-lanthanide  { background: var(--rose-bg);   color: var(--rose);   border-color: var(--rose-b); opacity: .85; }
+.pt-actinide    { background: var(--indigo-bg); color: var(--indigo); border-color: var(--indigo-b); opacity: .85; }
+.pt-h           { background: var(--coral-bg);  color: var(--coral);  border-color: var(--coral-b); }
