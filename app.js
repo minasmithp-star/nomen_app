@@ -297,8 +297,14 @@ function _fillCard(card) {
   $('card-group-label-back').textContent = groupText;
 
   const q = buildQuestion(card, session.mode);
-  $('card-question').textContent = q.question;
-  $('card-answer').textContent   = q.answer;
+  // Split into main text and hint line (hint goes smaller below)
+  const parts = q.question.split('\n');
+  const mainQ = parts[0];
+  const hintQ = parts[1] || '';
+  $('card-question').innerHTML = hintQ
+    ? `${mainQ}<span class="card-question-hint">${hintQ}</span>`
+    : mainQ;
+  $('card-answer').textContent = q.answer;
   buildDetails(card, session.mode);
 }
 
@@ -311,8 +317,9 @@ function buildGroupLabel(card) {
 }
 
 function buildQuestion(card, mode) {
-  const isCation = card.tipo === 'cationes';
-  const isAcido  = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
+  const isCation     = card.tipo === 'cationes';
+  const isAcido      = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
+  const nombrePropio = card.nombrePropio || card.subgrupo === 'poliatómicos';
 
   switch (mode) {
     case 'nombre-formula': return { question: card.nombre, answer: card.formula };
@@ -322,21 +329,29 @@ function buildQuestion(card, mode) {
       if (isAcido) return { question: card.nombre, answer: card.anion };
 
       if (isCation) {
-        const nEstados = card.estadosOxidacion ? card.estadosOxidacion.length : 1;
-        const formulaMask = card.carga === null
-          ? `${card.formula}^?`
-          : maskCarga(card.formula);
+        const n = card.estadosOxidacion ? card.estadosOxidacion.length : 1;
+        const pista = n === 1 ? 'tiene 1 estado de oxidación' : `tiene ${n} estados de oxidación`;
+
+        if (nombrePropio) {
+          // Cuproso, cúprico, ferroso, férrico, poliatómicos
+          // Frente: nombre + fórmula con ? + pista de cantidad
+          return {
+            question: `${card.nombre}  ${maskCarga(card.formula)}\n${pista}`,
+            answer: `Carga: +${card.carga}`,
+          };
+        }
+
+        // Cationes agrupados (Fe, Cu, etc.)
+        // Frente: nombre + símbolo + pista de cantidad
         return {
-          question: `${card.nombre}  ${formulaMask}`,
-          answer: nEstados === 1
-            ? `1 estado de oxidación`
-            : `${nEstados} estados de oxidación`,
+          question: `${card.nombre}  ${card.formula}\n${pista}`,
+          answer: card.estadosOxidacion ? card.estadosOxidacion.join('  ·  ') : `+${card.carga}`,
         };
       }
 
-      // Aniones: nombre + fórmula con ? en lugar de la carga
+      // Aniones: nombre + fórmula con ? superíndice
       return {
-        question: `${card.nombre}\n${maskCarga(card.formula)}`,
+        question: `${card.nombre}  ${maskCarga(card.formula)}`,
         answer: `Carga: ${card.carga > 0 ? '+' : ''}${card.carga}`,
       };
 
@@ -347,14 +362,14 @@ function buildQuestion(card, mode) {
   }
 }
 
-// Reemplaza el número de carga por ? en la fórmula
-// SO₄²⁻ → SO₄?⁻  |  Fe³⁺ → Fe?⁺  |  NH₄⁺ → NH₄?⁺
+// Muestra la fórmula sin la carga, seguida de (?)
+// SO₄²⁻ → SO₄ (?)  |  Fe³⁺ → Fe (?)  |  NH₄⁺ → NH₄ (?)
 function maskCarga(formula) {
-  // Superíndices numéricos unicode seguidos de + o -
-  let masked = formula.replace(/[²³⁴⁵⁶⁷⁸⁹](?=[⁺⁻])/g, '?');
-  // Si no hubo cambio y hay + o - sin número previo, insertar ?
+  // SO₄²⁻ → SO₄<sup>?</sup>⁻   NH₄⁺ → NH₄<sup>?</sup>⁺
+  let masked = formula.replace(/[²³⁴⁵⁶⁷⁸⁹]([⁺⁻])/, '<sup>?</sup>$1');
+  // Sin número antes del signo (ej H⁺) → insertar <sup>?</sup> antes
   if (masked === formula) {
-    masked = formula.replace(/([⁺⁻])/, '?$1');
+    masked = formula.replace(/([⁺⁻])/, '<sup>?</sup>$1');
   }
   return masked;
 }
@@ -362,14 +377,18 @@ function maskCarga(formula) {
 function buildDetails(card, mode) {
   const container = $('card-details');
   container.innerHTML = '';
-  const isCation = card.tipo === 'cationes';
-  const isAcido  = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
+  const isCation     = card.tipo === 'cationes';
+  const isAcido      = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
+  const nombrePropio = card.nombrePropio || card.subgrupo === 'poliatómicos';
   const rows = [];
 
-  if (mode === 'carga' && isCation && card.estadosOxidacion) {
-    // Mostrar la lista de todos los estados de oxidación
-    rows.push({ l: 'Estados de oxidación', v: card.estadosOxidacion.join('   ·   ') });
-    rows.push({ l: 'Sales', v: card.sales });
+  if (mode === 'carga' && isCation) {
+    // Reverso modo carga — solo estados de oxidación, sin sales
+    if (!nombrePropio && card.estadosOxidacion && card.estadosOxidacion.length > 1) {
+      // Para agrupados ya está en la respuesta principal, agregamos fórmulas
+      rows.push({ l: 'Fórmulas', v: card.estadosOxidacion.map((e,i) => `${card.formula}${['⁺','²⁺','³⁺','⁴⁺'][parseInt(e)-1] || e}`).join('  ') });
+    }
+    rows.push({ l: 'Reacción', v: card.reaccion });
   } else {
     if (mode !== 'nombre-formula') rows.push({ l: 'Nombre',  v: card.nombre });
     if (mode !== 'formula-nombre') rows.push({ l: 'Fórmula', v: card.formula });
