@@ -304,11 +304,11 @@ body {
 }
 
 /* ── Estilos tipográficos de tarjeta ──────────────────── */
-/* Nombre: DM Serif Display, negrita, negro */
+/* Nombre: DM Serif Display, itálica, negro */
 .st-nombre {
   font-family: 'DM Serif Display', serif;
-  font-weight: 700;
-  font-style: normal;
+  font-weight: 400;
+  font-style: italic;
   color: var(--text);
 }
 /* Fórmula: DM Serif Display, negrita, itálica, color acento */
@@ -318,11 +318,18 @@ body {
   font-style: italic;
   color: var(--accent);
 }
-/* Respuesta (carga, sales): DM Serif Display, negrita, color acento */
+/* Respuesta de carga: DM Serif Display, itálica, color acento */
 .st-respuesta {
   font-family: 'DM Serif Display', serif;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--accent);
+}
+/* Respuesta de sales: DM Serif Display, negrita, itálica, color acento */
+.st-respuesta-sales {
+  font-family: 'DM Serif Display', serif;
   font-weight: 700;
-  font-style: normal;
+  font-style: italic;
   color: var(--accent);
 }
   font-size: .55em;
