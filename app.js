@@ -265,8 +265,18 @@ function shuffle(arr) {
   return a;
 }
 
+const MODE_LABELS = {
+  'nombre-formula': 'Nombre → Fórmula',
+  'formula-nombre': 'Fórmula → Nombre',
+  'carga':          'Carga & Oxidación',
+  'sales':          'Sales',
+};
+
 function startSession(mode, pool) {
   session = { mode, queue: shuffle(pool), index: 0, correct: 0, wrong: 0, ok: 0, hardCards: [], isFlipped: false };
+  // Mostrar badge de modo en la barra
+  const badge = $('mode-badge');
+  if (badge) badge.textContent = MODE_LABELS[mode] || mode;
   showScreen('quiz');
   renderCard();
 }
@@ -448,14 +458,18 @@ function setCardAnswer(el, mode, card) {
 
     case 'carga':
       if (isAcido) {
-        html = styledRespuesta(card.anion);
+        html = `<span class="card-answer-title">Carga</span>${styledRespuesta(card.anion)}`;
       } else if (isCation) {
-        const resp = nombrePropio
-          ? `Carga: +${card.carga}`
-          : card.estadosOxidacion.join('  ·  ');
-        html = styledRespuesta(resp);
+        if (nombrePropio) {
+          html = `<span class="card-answer-title">Carga</span>${styledRespuesta(`+${card.carga}`)}`;
+        } else {
+          const estados = card.estadosOxidacion || [];
+          const titulo  = estados.length > 1 ? 'Cargas' : 'Carga';
+          html = `<span class="card-answer-title">${titulo}</span>${styledRespuesta(estados.join('  ·  '))}`;
+        }
       } else {
-        html = styledRespuesta(`Carga: ${card.carga > 0 ? '+' : ''}${card.carga}`);
+        const titulo = 'Carga';
+        html = `<span class="card-answer-title">${titulo}</span>${styledRespuesta(`${card.carga > 0 ? '+' : ''}${card.carga}`)}`;
       }
       break;
 
