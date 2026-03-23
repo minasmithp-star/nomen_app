@@ -372,9 +372,13 @@ function styledNombre(text) {
 function styledFormula(text) {
   return `<span class="st-formula">${text}</span>`;
 }
-// Respuesta de carga/sales: DM Serif Display, negrita, color acento
+// Respuesta de carga: itálica, color acento
 function styledRespuesta(text) {
   return `<span class="st-respuesta">${text}</span>`;
+}
+// Respuesta de sales: negrita itálica, color acento
+function styledRespuestaSales(text) {
+  return `<span class="st-respuesta-sales">${text}</span>`;
 }
 
 function setCardQuestion(el, mode, card) {
@@ -456,7 +460,7 @@ function setCardAnswer(el, mode, card) {
       break;
 
     case 'sales':
-      html = styledRespuesta(card.sales);
+      html = styledRespuestaSales(card.sales);
       break;
 
     default:
