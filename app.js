@@ -1,5 +1,7 @@
 // app.js — Nomen · v3 · racha por días, progreso, mensajes personalizados
 
+import { saveToCloud, loadFromCloud, subscribeToCloud } from './firebase.js';
+
 const STATE_KEY = 'nomen-v3';
 
 // ── Colores HexNote por subgrupo ───────────────────────
@@ -66,7 +68,6 @@ let session = {
 };
 
 // ── Firebase sync ──────────────────────────────────────
-import { saveToCloud, loadFromCloud, subscribeToCloud } from './firebase.js';
 
 let cloudSyncEnabled = false;
 let unsubscribeCloud = null;
