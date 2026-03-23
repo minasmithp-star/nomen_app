@@ -18,13 +18,35 @@
 
   <!-- SCREEN: Home -->
   <div id="screen-home" class="screen active">
+
+    <!-- 1. STATS — arriba, pequeños -->
+    <div class="stats-bar">
+      <div class="stat">
+        <span id="stat-streak">0</span>
+        <small>racha</small>
+        <tiny>días</tiny>
+      </div>
+      <div class="stat">
+        <span id="stat-best">0</span>
+        <small>mejor</small>
+        <tiny>racha</tiny>
+      </div>
+      <div class="stat">
+        <span id="stat-learned">0</span>
+        <small>aprendidas</small>
+        <tiny>de <b id="stat-total">0</b></tiny>
+      </div>
+    </div>
+
+    <!-- 2. HEADER -->
+    <div class="home-inner">
     <header class="home-header">
       <div class="logo-mark">⬡</div>
       <h1>Nomen</h1>
       <p class="subtitle">Nomenclatura · Química Inorgánica</p>
     </header>
 
-    <!-- FILTROS — primero -->
+    <!-- 3. FILTROS -->
     <section class="set-selector">
       <p class="set-label">Sección</p>
       <div class="section-tabs">
@@ -55,11 +77,25 @@
         <button class="set-tab" data-set="oxoácidos">Oxoácidos</button>
       </div>
       <div class="set-tabs hidden" id="subtabs-todo">
-        <button class="set-tab active" data-set="todo">Todo (65)</button>
+        <button class="set-tab active" data-set="todo">Todo</button>
       </div>
     </section>
 
-    <!-- MODOS — después -->
+    <!-- 4. CANTIDAD -->
+    <div class="count-selector">
+      <p class="set-label">Cantidad de tarjetas</p>
+      <div class="count-tabs">
+        <button class="count-tab" data-count="10">10</button>
+        <button class="count-tab" data-count="20">20</button>
+        <button class="count-tab" data-count="30">30</button>
+        <button class="count-tab active" data-count="all">Todas</button>
+      </div>
+    </div>
+
+    <!-- 5. BOTÓN -->
+    <button class="btn-primary" id="btn-start">Comenzar sesión</button>
+
+    <!-- 6. MODOS 2x2 -->
     <nav class="mode-grid">
       <button class="mode-card selected" data-mode="nombre-formula">
         <span class="mode-icon">𝑓(x)</span>
@@ -83,38 +119,8 @@
       </button>
     </nav>
 
-    <!-- STATS — racha de días visible -->
-    <div class="stats-bar">
-      <div class="stat">
-        <span id="stat-streak">0</span>
-        <small>racha</small>
-        <tiny>días</tiny>
-      </div>
-      <div class="stat">
-        <span id="stat-best">0</span>
-        <small>mejor</small>
-        <tiny>racha</tiny>
-      </div>
-      <div class="stat">
-        <span id="stat-learned">0</span>
-        <small>aprendidas</small>
-        <tiny>de <b id="stat-total">0</b></tiny>
-      </div>
-    </div>
-
-    <button class="btn-primary" id="btn-start">Comenzar sesión</button>
-
-    <div class="count-selector">
-      <p class="set-label">Cantidad de tarjetas</p>
-      <div class="count-tabs">
-        <button class="count-tab" data-count="10">10</button>
-        <button class="count-tab" data-count="20">20</button>
-        <button class="count-tab" data-count="30">30</button>
-        <button class="count-tab active" data-count="all">Todas</button>
-      </div>
-    </div>
-
     <button class="btn-ghost" id="btn-reset">Reiniciar progreso</button>
+    </div><!-- end home-inner -->
   </div>
 
   <!-- SCREEN: Quiz -->
@@ -158,15 +164,11 @@
       <div class="results-icon" id="results-icon">◈</div>
       <h2 id="results-title">Sesión completa</h2>
       <p id="results-msg"></p>
-
-      <!-- Stats de sesión -->
       <div class="results-stats">
         <div class="rstat"><span id="r-correct"></span><small>lo sabía</small></div>
         <div class="rstat"><span id="r-wrong"></span><small>no sabía</small></div>
         <div class="rstat"><span id="r-pct"></span><small>precisión</small></div>
       </div>
-
-      <!-- Racha de días -->
       <div class="results-streak-box">
         <div class="rsb-main" id="results-streak">❤︎ 0 días</div>
         <div class="rsb-sub">
@@ -174,13 +176,10 @@
           <span id="results-best">mejor: 0</span>
         </div>
       </div>
-
-      <!-- Gráfico de historial -->
       <div class="chart-wrap">
         <p class="chart-title">Últimas sesiones</p>
         <div class="history-chart" id="history-chart"></div>
       </div>
-
       <button class="btn-primary" id="btn-review">Repasar los que fallé</button>
       <button class="btn-ghost"   id="btn-home">Volver al inicio</button>
     </div>
