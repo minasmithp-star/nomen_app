@@ -302,6 +302,12 @@ body {
   font-size: 2rem; font-weight: 400; color: var(--text);
   text-align: center; line-height: 1.25; white-space: pre-line;
 }
+
+/* La segunda línea (pista de estados) se muestra más chica */
+.card-question-hint {
+  font-size: .82rem; color: var(--accent); font-weight: 400;
+  display: block; margin-top: 6px; letter-spacing: .01em;
+}
 .card-tap-hint {
   position: absolute; bottom: 14px;
   font-size: .65rem; color: var(--muted); letter-spacing: .04em;
