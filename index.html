@@ -43,6 +43,7 @@
     <header class="home-header">
       <h1>Nomen</h1>
       <p class="subtitle">Nomenclatura · Química Inorgánica</p>
+      <span class="sync-status" id="sync-status">○ conectando...</span>
     </header>
 
     <!-- 3. FILTROS -->
@@ -186,7 +187,7 @@
 
 </div>
 <script src="data.js"></script>
-<script src="app.js"></script>
+<script type="module" src="app.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
