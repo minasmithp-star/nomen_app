@@ -303,11 +303,26 @@ body {
   text-align: center; line-height: 1.25; white-space: pre-line;
 }
 
-/* Fórmula en DM Serif Display itálica con color acento */
-.card-formula-bold {
+/* ── Estilos tipográficos de tarjeta ──────────────────── */
+/* Nombre: DM Serif Display, negrita, negro */
+.st-nombre {
   font-family: 'DM Serif Display', serif;
-  font-weight: 400;
+  font-weight: 700;
+  font-style: normal;
+  color: var(--text);
+}
+/* Fórmula: DM Serif Display, negrita, itálica, color acento */
+.st-formula {
+  font-family: 'DM Serif Display', serif;
+  font-weight: 700;
   font-style: italic;
+  color: var(--accent);
+}
+/* Respuesta (carga, sales): DM Serif Display, negrita, color acento */
+.st-respuesta {
+  font-family: 'DM Serif Display', serif;
+  font-weight: 700;
+  font-style: normal;
   color: var(--accent);
 }
   font-size: .55em;
