@@ -305,7 +305,7 @@ function _fillCard(card) {
   const mainQ = parts[0];
   const hintQ = parts[1] || '';
   setCardQuestion($('card-question'), mainQ, hintQ);
-  $('card-answer').textContent = q.answer;
+  $('card-answer').innerHTML = `<span class="card-formula-bold">${q.answer}</span>`;
   buildDetails(card, session.mode);
 }
 
@@ -368,7 +368,6 @@ function stripCarga(formula) {
 }
 
 function setCardQuestion(el, mainQ, hintQ) {
-  // If mainQ contains "  " (double space), split into name + formula
   const parts = mainQ.split('  ');
   let html;
   if (parts.length >= 2) {
@@ -378,7 +377,7 @@ function setCardQuestion(el, mainQ, hintQ) {
   } else {
     html = mainQ;
   }
-  if (hintQ) html += `<span class="card-question-hint">${hintQ}</span>`;
+  if (hintQ) html += `<br><span class="card-question-hint">${hintQ}</span>`;
   el.innerHTML = html;
 }
 
@@ -399,7 +398,7 @@ function buildDetails(card, mode) {
     rows.push({ l: 'Reacción', v: card.reaccion });
   } else {
     if (mode !== 'nombre-formula') rows.push({ l: 'Nombre',  v: capitalize(card.nombre) });
-    if (mode !== 'formula-nombre') rows.push({ l: 'Fórmula', v: card.formula });
+    if (mode !== 'formula-nombre') rows.push({ l: 'Fórmula', v: card.formula, isFormula: true });
     if (isAcido) {
       if (mode !== 'carga') rows.push({ l: 'Anión', v: card.anion });
       rows.push({ l: 'Ka', v: card.ka });
@@ -415,7 +414,10 @@ function buildDetails(card, mode) {
   rows.slice(0, 2).forEach(r => {
     const div = document.createElement('div');
     div.className = 'detail-pill';
-    div.innerHTML = `<span class="dpill-label">${r.l}</span><span class="dpill-val">${r.v}</span>`;
+    const valHtml = r.isFormula
+      ? `<span class="card-formula-bold" style="font-size:.85rem">${r.v}</span>`
+      : r.v;
+    div.innerHTML = `<span class="dpill-label">${r.l}</span><span class="dpill-val">${valHtml}</span>`;
     container.appendChild(div);
   });
 }
@@ -479,7 +481,7 @@ function rate(level) {
     const mainQ = parts[0];
     const hintQ = parts[1] || '';
     setCardQuestion($('card-question'), mainQ, hintQ);
-    $('card-answer').textContent = q.answer;
+    $('card-answer').innerHTML = `<span class="card-formula-bold">${q.answer}</span>`;
     buildDetails(next, session.mode);
 
     const pct = (session.index / session.queue.length) * 100;
