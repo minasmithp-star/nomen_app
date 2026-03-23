@@ -41,10 +41,44 @@
     <!-- 2. HEADER -->
     <div class="home-inner">
     <header class="home-header">
+      <button class="pt-btn" id="btn-pt" onclick="openPT()" title="Tabla periódica">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22">
+          <rect x="2"  y="2"  width="8" height="8" rx="2" fill="currentColor" opacity=".9"/>
+          <rect x="26" y="2"  width="8" height="8" rx="2" fill="currentColor" opacity=".9"/>
+          <rect x="2"  y="14" width="8" height="8" rx="2" fill="currentColor" opacity=".7"/>
+          <rect x="14" y="14" width="8" height="8" rx="2" fill="currentColor" opacity=".7"/>
+          <rect x="26" y="14" width="8" height="8" rx="2" fill="currentColor" opacity=".7"/>
+          <rect x="2"  y="26" width="8" height="8" rx="2" fill="currentColor" opacity=".5"/>
+          <rect x="14" y="26" width="8" height="8" rx="2" fill="currentColor" opacity=".5"/>
+          <rect x="26" y="26" width="8" height="8" rx="2" fill="currentColor" opacity=".5"/>
+        </svg>
+      </button>
       <h1>Nomen</h1>
       <p class="subtitle">Nomenclatura · Química Inorgánica</p>
       <span class="sync-status" id="sync-status">○ conectando...</span>
     </header>
+
+    <!-- MODAL: Tabla periódica -->
+    <div class="pt-overlay hidden" id="pt-overlay" onclick="closePT(event)">
+      <div class="pt-modal" id="pt-modal">
+        <div class="pt-modal-header">
+          <span class="pt-modal-title">Tabla Periódica</span>
+          <button class="pt-close" onclick="closePT()">✕</button>
+        </div>
+        <div class="pt-legend">
+          <span class="pt-leg" style="--lc:var(--slate)">Alcalinos</span>
+          <span class="pt-leg" style="--lc:var(--teal)">Alcalinotérreos</span>
+          <span class="pt-leg" style="--lc:var(--lav)">Transición</span>
+          <span class="pt-leg" style="--lc:var(--ochre)">Principales</span>
+          <span class="pt-leg" style="--lc:var(--rose)">Lantánidos</span>
+          <span class="pt-leg" style="--lc:var(--coral)">No metales</span>
+          <span class="pt-leg" style="--lc:var(--slate)">Gases nobles</span>
+        </div>
+        <div class="pt-scroll">
+          <div class="pt-table" id="pt-table"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- 3. FILTROS -->
     <section class="set-selector">
@@ -187,6 +221,7 @@
 
 </div>
 <script src="data.js"></script>
+<script src="periodic-table.js"></script>
 <script type="module" src="app.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
