@@ -297,13 +297,10 @@ function _fillCard(card) {
   $('card-group-label-back').textContent = groupText;
 
   const q = buildQuestion(card, session.mode);
-  // Split into main text and hint line (hint goes smaller below)
   const parts = q.question.split('\n');
   const mainQ = parts[0];
   const hintQ = parts[1] || '';
-  $('card-question').innerHTML = hintQ
-    ? `${mainQ}<span class="card-question-hint">${hintQ}</span>`
-    : mainQ;
+  setCardQuestion($('card-question'), mainQ, hintQ);
   $('card-answer').textContent = q.answer;
   buildDetails(card, session.mode);
 }
@@ -363,18 +360,25 @@ function buildQuestion(card, mode) {
 }
 
 // Muestra la fórmula sin la carga, seguida de (?)
-// SO₄²⁻ → SO₄ (?)  |  Fe³⁺ → Fe (?)  |  NH₄⁺ → NH₄ (?)
+// Quita el número de carga y pone ˣ superíndice + signo
+// SO₄²⁻ → SO₄ˣ⁻   NH₄⁺ → NH₄ˣ⁺   Fe → Feˣ
 function maskCarga(formula) {
-  // SO₄²⁻ → SO₄<sup>?</sup>⁻   NH₄⁺ → NH₄<sup>?</sup>⁺
-  let masked = formula.replace(/[²³⁴⁵⁶⁷⁸⁹]([⁺⁻])/, '<sup>?</sup>$1');
-  // Sin número antes del signo (ej H⁺) → insertar <sup>?</sup> antes
+  // Quitar número superíndice, mantener signo, insertar ˣ antes
+  let masked = formula.replace(/[²³⁴⁵⁶⁷⁸⁹]([⁺⁻])/, 'ˣ$1');
+  // Sin número (ej H⁺, F⁻) → insertar ˣ antes del signo
   if (masked === formula) {
-    masked = formula.replace(/([⁺⁻])/, '<sup>?</sup>$1');
+    masked = formula.replace(/([⁺⁻])/, 'ˣ$1');
   }
   return masked;
 }
 
-function buildDetails(card, mode) {
+function setCardQuestion(el, mainQ, hintQ) {
+  if (hintQ) {
+    el.innerHTML = `${mainQ}<span class="card-question-hint">${hintQ}</span>`;
+  } else {
+    el.textContent = mainQ;
+  }
+}
   const container = $('card-details');
   container.innerHTML = '';
   const isCation     = card.tipo === 'cationes';
@@ -467,8 +471,11 @@ function rate(level) {
     $('card-group-label').textContent      = groupText;
     $('card-group-label-back').textContent = groupText;
     const q = buildQuestion(next, session.mode);
-    $('card-question').textContent = q.question;
-    $('card-answer').textContent   = q.answer;
+    const parts = q.question.split('\n');
+    const mainQ = parts[0];
+    const hintQ = parts[1] || '';
+    setCardQuestion($('card-question'), mainQ, hintQ);
+    $('card-answer').textContent = q.answer;
     buildDetails(next, session.mode);
 
     const pct = (session.index / session.queue.length) * 100;
