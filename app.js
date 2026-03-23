@@ -324,35 +324,39 @@ function buildGroupLabel(card) {
 }
 
 function buildQuestion(card, mode) {
-  const isCation     = card.tipo === 'cationes';
-  const isAcido      = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
-  const nombrePropio = card.nombrePropio || card.subgrupo === 'poliatómicos';
-  const nombre       = capitalize(card.nombre);
+  const isCation      = card.tipo === 'cationes';
+  const isAcido       = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
+  const nombrePropio  = card.nombrePropio || card.subgrupo === 'poliatómicos';
+  const isCatMono     = isCation && !nombrePropio; // catión monoatómico (no poliatómico, no ferroso etc.)
+  const nombre        = capitalize(card.nombre);
 
   switch (mode) {
-    case 'nombre-formula': return { question: nombre, answer: card.formula };
-    case 'formula-nombre': return { question: card.formula, answer: nombre };
+    case 'nombre-formula':
+      // Catión monoatómico → frente: solo nombre
+      // Reverso lo maneja setCardAnswer
+      return { question: nombre, answer: card.formula };
+
+    case 'formula-nombre':
+      // Catión monoatómico → frente: símbolo base sin carga
+      if (isCatMono) return { question: stripCarga(card.formula), answer: nombre };
+      return { question: card.formula, answer: nombre };
 
     case 'carga':
       if (isAcido) return { question: nombre, answer: card.anion };
-
       if (isCation) {
         const n = card.estadosOxidacion ? card.estadosOxidacion.length : 1;
         const pista = n === 1 ? 'tiene 1 estado de oxidación' : `tiene ${n} estados de oxidación`;
-        // Fórmula desnuda (sin carga)
         const formulaDesnuda = stripCarga(card.formula);
         return {
           question: `${nombre}  ${formulaDesnuda}\n${pista}`,
           answer: nombrePropio
-            ? `Carga: +${card.carga}`
+            ? `+${card.carga}`
             : card.estadosOxidacion.join('  ·  '),
         };
       }
-
-      // Aniones: fórmula desnuda
       return {
         question: `${nombre}  ${stripCarga(card.formula)}`,
-        answer: `Carga: ${card.carga > 0 ? '+' : ''}${card.carga}`,
+        answer: `${card.carga > 0 ? '+' : ''}${card.carga}`,
       };
 
     case 'sales':
@@ -438,21 +442,22 @@ function setCardQuestion(el, mode, card) {
 }
 
 function setCardAnswer(el, mode, card) {
-  const nombre = capitalize(card.nombre);
-  const isCation = card.tipo === 'cationes';
-  const isAcido  = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
+  const nombre       = capitalize(card.nombre);
+  const isCation     = card.tipo === 'cationes';
+  const isAcido      = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
   const nombrePropio = card.nombrePropio || card.subgrupo === 'poliatómicos';
+  const isCatMono    = isCation && !nombrePropio;
 
   let html = '';
 
   switch (mode) {
     case 'nombre-formula':
-      // Reverso: fórmula itálica color acento
-      html = styledFormula(card.formula);
+      // Catión monoatómico → símbolo base sin carga (cargas van en buildDetails)
+      html = styledFormula(isCatMono ? stripCarga(card.formula) : card.formula);
       break;
 
     case 'formula-nombre':
-      // Reverso: nombre negro serif
+      // Reverso: nombre (cargas van en buildDetails para catMono)
       html = styledNombre(nombre);
       break;
 
@@ -468,8 +473,7 @@ function setCardAnswer(el, mode, card) {
           html = `<span class="card-answer-title">${titulo}</span>${styledRespuesta(estados.join('  ·  '))}`;
         }
       } else {
-        const titulo = 'Carga';
-        html = `<span class="card-answer-title">${titulo}</span>${styledRespuesta(`${card.carga > 0 ? '+' : ''}${card.carga}`)}`;
+        html = `<span class="card-answer-title">Carga</span>${styledRespuesta(`${card.carga > 0 ? '+' : ''}${card.carga}`)}`;
       }
       break;
 
@@ -492,29 +496,40 @@ function buildDetails(card, mode) {
   const nombrePropio = card.nombrePropio || card.subgrupo === 'poliatómicos';
   const rows = [];
 
+  const isCatMono = isCation && !nombrePropio;
+
   if (mode === 'carga' && isCation) {
-    // Reverso modo carga — solo estados de oxidación, sin sales
     if (!nombrePropio && card.estadosOxidacion && card.estadosOxidacion.length > 1) {
-      // Para agrupados ya está en la respuesta principal, agregamos fórmulas
       rows.push({ l: 'Fórmulas', v: card.estadosOxidacion.map((e,i) => `${card.formula}${['⁺','²⁺','³⁺','⁴⁺'][parseInt(e)-1] || e}`).join('  ') });
     }
     rows.push({ l: 'Reacción', v: card.reaccion });
   } else {
     if (mode !== 'nombre-formula') rows.push({ l: 'Nombre',  v: capitalize(card.nombre) });
     if (mode !== 'formula-nombre') rows.push({ l: 'Fórmula', v: card.formula, isFormula: true });
+
     if (isAcido) {
       if (mode !== 'carga') rows.push({ l: 'Anión', v: card.anion });
       rows.push({ l: 'Ka', v: card.ka });
     } else if (isCation) {
-      if (card.carga !== null) rows.push({ l: 'Carga', v: `+${card.carga}` });
-      rows.push({ l: 'Origen', v: card.origen });
+      if (isCatMono && (mode === 'nombre-formula' || mode === 'formula-nombre')) {
+        // Catión monoatómico: mostrar todas las cargas en pill
+        const estados = card.estadosOxidacion || (card.carga !== null ? [`+${card.carga}`] : []);
+        const titulo  = estados.length > 1 ? 'Cargas' : 'Carga';
+        if (estados.length) rows.push({ l: titulo, v: estados.join('  ·  ') });
+      } else if (card.carga === null && card.estadosOxidacion && card.estadosOxidacion.length > 1) {
+        const titulo = 'Cargas';
+        rows.push({ l: titulo, v: card.estadosOxidacion.join('  ·  ') });
+      } else if (card.carga !== null) {
+        rows.push({ l: 'Carga', v: `+${card.carga}` });
+      }
+      if (mode === 'nombre-formula') rows.push({ l: 'Origen', v: card.origen });
     } else {
       if (mode !== 'carga') rows.push({ l: 'Carga', v: `${card.carga}` });
       if (card.oxoacido && card.oxoacido !== '—') rows.push({ l: 'Oxoácido', v: card.oxoacido });
     }
   }
 
-  rows.slice(0, 2).forEach(r => {
+  rows.slice(0, 3).forEach(r => {
     const div = document.createElement('div');
     div.className = 'detail-pill';
     const valHtml = r.isFormula
