@@ -353,28 +353,20 @@ function rate(level) {
     $('streak-badge').textContent   = `❤︎ ${state.streak}`;
   }, 220);
 
-  // Al terminar: reset limpio
-  setTimeout(() => {
+  // Usamos transitionend para el reset — más confiable en móvil que setTimeout
+  flip.addEventListener('transitionend', function onEnd() {
+    flip.removeEventListener('transitionend', onEnd);
     if (!session.queue[session.index]) { showResults(); return; }
+    // Desactivar transición ANTES de resetear — evita que el browser anime el reset
     flip.style.transition = 'none';
     flip.style.transform  = 'rotateY(0deg)';
     back.style.visibility = 'visible';
     session.isFlipped = false;
-    requestAnimationFrame(() => {
+    // Reactivar transición en el siguiente frame de render
+    requestAnimationFrame(() => requestAnimationFrame(() => {
       flip.style.transition = 'transform .55s cubic-bezier(.6,0,.2,1)';
-    });
-  }, 560);
-
-  // Al terminar el flip reseteamos transform
-  setTimeout(() => {
-    if (!session.queue[session.index]) { showResults(); return; }
-    flip.style.transition = 'none';
-    flip.style.transform  = 'rotateY(0deg)';
-    session.isFlipped = false;
-    requestAnimationFrame(() => {
-      flip.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
-    });
-  }, 410);
+    }));
+  });
 }
 
 $('btn-back').addEventListener('click', () => { showScreen('home'); updateHomeStats(); });
