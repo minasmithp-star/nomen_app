@@ -303,8 +303,18 @@ body {
   text-align: center; line-height: 1.25; white-space: pre-line;
 }
 
-/* La segunda línea (pista de estados) se muestra más chica */
-.card-question-hint {
+/* Fórmula en negrita DM Serif Display */
+.card-formula-bold {
+  font-family: 'DM Serif Display', serif;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--accent);
+}
+  font-size: .55em;
+  vertical-align: super;
+  color: var(--accent);
+  font-weight: 600;
+}
   font-size: .82rem; color: var(--accent); font-weight: 400;
   display: block; margin-top: 6px; letter-spacing: .01em;
 }
