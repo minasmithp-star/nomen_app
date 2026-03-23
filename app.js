@@ -313,16 +313,50 @@ function buildGroupLabel(card) {
 function buildQuestion(card, mode) {
   const isCation = card.tipo === 'cationes';
   const isAcido  = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
+
   switch (mode) {
     case 'nombre-formula': return { question: card.nombre, answer: card.formula };
     case 'formula-nombre': return { question: card.formula, answer: card.nombre };
+
     case 'carga':
       if (isAcido) return { question: card.nombre, answer: card.anion };
-      return { question: card.nombre, answer: `Carga: ${card.carga > 0 ? '+' : ''}${card.carga}` };
+
+      if (isCation) {
+        const nEstados = card.estadosOxidacion ? card.estadosOxidacion.length : 1;
+        const formulaMask = card.carga === null
+          ? `${card.formula}^?`
+          : maskCarga(card.formula);
+        return {
+          question: `${card.nombre}  ${formulaMask}`,
+          answer: nEstados === 1
+            ? `1 estado de oxidación`
+            : `${nEstados} estados de oxidación`,
+        };
+      }
+
+      // Aniones: nombre + fórmula con ? en lugar de la carga
+      return {
+        question: `${card.nombre}\n${maskCarga(card.formula)}`,
+        answer: `Carga: ${card.carga > 0 ? '+' : ''}${card.carga}`,
+      };
+
     case 'sales':
       return { question: card.nombre, answer: card.sales };
-    default: return { question: card.nombre, answer: card.formula };
+    default:
+      return { question: card.nombre, answer: card.formula };
   }
+}
+
+// Reemplaza el número de carga por ? en la fórmula
+// SO₄²⁻ → SO₄?⁻  |  Fe³⁺ → Fe?⁺  |  NH₄⁺ → NH₄?⁺
+function maskCarga(formula) {
+  // Superíndices numéricos unicode seguidos de + o -
+  let masked = formula.replace(/[²³⁴⁵⁶⁷⁸⁹](?=[⁺⁻])/g, '?');
+  // Si no hubo cambio y hay + o - sin número previo, insertar ?
+  if (masked === formula) {
+    masked = formula.replace(/([⁺⁻])/, '?$1');
+  }
+  return masked;
 }
 
 function buildDetails(card, mode) {
@@ -331,18 +365,26 @@ function buildDetails(card, mode) {
   const isCation = card.tipo === 'cationes';
   const isAcido  = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
   const rows = [];
-  if (mode !== 'nombre-formula') rows.push({ l: 'Nombre',  v: card.nombre });
-  if (mode !== 'formula-nombre') rows.push({ l: 'Fórmula', v: card.formula });
-  if (isAcido) {
-    if (mode !== 'carga') rows.push({ l: 'Anión', v: card.anion });
-    rows.push({ l: 'Ka', v: card.ka });
-  } else if (isCation) {
-    rows.push({ l: 'Carga',  v: `+${card.carga}` });
-    rows.push({ l: 'Origen', v: card.origen });
+
+  if (mode === 'carga' && isCation && card.estadosOxidacion) {
+    // Mostrar la lista de todos los estados de oxidación
+    rows.push({ l: 'Estados de oxidación', v: card.estadosOxidacion.join('   ·   ') });
+    rows.push({ l: 'Sales', v: card.sales });
   } else {
-    if (mode !== 'carga') rows.push({ l: 'Carga', v: `${card.carga}` });
-    if (card.oxoacido && card.oxoacido !== '—') rows.push({ l: 'Oxoácido', v: card.oxoacido });
+    if (mode !== 'nombre-formula') rows.push({ l: 'Nombre',  v: card.nombre });
+    if (mode !== 'formula-nombre') rows.push({ l: 'Fórmula', v: card.formula });
+    if (isAcido) {
+      if (mode !== 'carga') rows.push({ l: 'Anión', v: card.anion });
+      rows.push({ l: 'Ka', v: card.ka });
+    } else if (isCation) {
+      if (card.carga !== null) rows.push({ l: 'Carga', v: `+${card.carga}` });
+      rows.push({ l: 'Origen', v: card.origen });
+    } else {
+      if (mode !== 'carga') rows.push({ l: 'Carga', v: `${card.carga}` });
+      if (card.oxoacido && card.oxoacido !== '—') rows.push({ l: 'Oxoácido', v: card.oxoacido });
+    }
   }
+
   rows.slice(0, 2).forEach(r => {
     const div = document.createElement('div');
     div.className = 'detail-pill';
