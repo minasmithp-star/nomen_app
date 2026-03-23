@@ -274,7 +274,6 @@ const MODE_LABELS = {
 
 function startSession(mode, pool) {
   session = { mode, queue: shuffle(pool), index: 0, correct: 0, wrong: 0, ok: 0, hardCards: [], isFlipped: false };
-  // Mostrar badge de modo en la barra
   const badge = $('mode-badge');
   if (badge) badge.textContent = MODE_LABELS[mode] || mode;
   showScreen('quiz');
@@ -290,8 +289,18 @@ function renderCard() {
   flip.style.transition = 'none';
   flip.style.transform  = 'rotateY(0deg)';
   $('rating-row').classList.remove('visible');
+  // Mostrar/ocultar botón de retroceso
+  const btnPrev = $('btn-prev');
+  if (btnPrev) btnPrev.style.visibility = session.index > 0 ? 'visible' : 'hidden';
   _fillCard(card);
 }
+
+function goBack() {
+  if (session.index <= 0) return;
+  session.index--;
+  renderCard();
+}
+window.goBack = goBack;
 
 function _fillCard(card) {
   if (!card) { showResults(); return; }
