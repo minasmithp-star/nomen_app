@@ -190,7 +190,19 @@ body {
 }
 .notif-actions button:first-child { background: var(--sage); color: #fff; border-color: var(--sage); }
 
-/* Count selector */
+/* Sync status */
+.sync-status {
+  display: block; font-size: .65rem; color: var(--muted);
+  margin-top: 4px; letter-spacing: .04em;
+}
+.sync-badge {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--sage); color: #fff;
+  padding: 8px 18px; border-radius: 20px;
+  font-size: .78rem; font-weight: 500;
+  animation: fade-up .3s ease;
+  z-index: 999;
+}
 .count-selector { display: flex; flex-direction: column; gap: 8px; }
 .count-tabs {
   display: flex; gap: 8px;
