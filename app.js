@@ -383,6 +383,8 @@ function setCardQuestion(el, mainQ, hintQ) {
     el.textContent = mainQ;
   }
 }
+
+function buildDetails(card, mode) {
   const container = $('card-details');
   container.innerHTML = '';
   const isCation     = card.tipo === 'cationes';
