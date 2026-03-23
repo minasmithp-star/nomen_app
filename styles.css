@@ -566,3 +566,14 @@ body {
 .pt-lanthanide  { background: var(--rose-bg);   color: var(--rose);   border-color: var(--rose-b); opacity: .85; }
 .pt-actinide    { background: var(--indigo-bg); color: var(--indigo); border-color: var(--indigo-b); opacity: .85; }
 .pt-h           { background: var(--coral-bg);  color: var(--coral);  border-color: var(--coral-b); }
+
+/* Pista de estados de oxidación */
+.card-question-hint {
+  font-size: .82rem;
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-weight: 400;
+  color: var(--accent);
+  display: block;
+  margin-top: 6px;
+}
