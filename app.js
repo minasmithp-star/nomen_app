@@ -321,67 +321,65 @@ function buildQuestion(card, mode) {
   const isCation     = card.tipo === 'cationes';
   const isAcido      = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
   const nombrePropio = card.nombrePropio || card.subgrupo === 'poliatómicos';
+  const nombre       = capitalize(card.nombre);
 
   switch (mode) {
-    case 'nombre-formula': return { question: card.nombre, answer: card.formula };
-    case 'formula-nombre': return { question: card.formula, answer: card.nombre };
+    case 'nombre-formula': return { question: nombre, answer: card.formula };
+    case 'formula-nombre': return { question: card.formula, answer: nombre };
 
     case 'carga':
-      if (isAcido) return { question: card.nombre, answer: card.anion };
+      if (isAcido) return { question: nombre, answer: card.anion };
 
       if (isCation) {
         const n = card.estadosOxidacion ? card.estadosOxidacion.length : 1;
         const pista = n === 1 ? 'tiene 1 estado de oxidación' : `tiene ${n} estados de oxidación`;
-
-        if (nombrePropio) {
-          // Cuproso, cúprico, ferroso, férrico, poliatómicos
-          // Frente: nombre + fórmula con ? + pista de cantidad
-          return {
-            question: `${card.nombre}  ${maskCarga(card.formula)}\n${pista}`,
-            answer: `Carga: +${card.carga}`,
-          };
-        }
-
-        // Cationes agrupados (Fe, Cu, etc.)
-        // Frente: nombre + símbolo + pista de cantidad
+        // Fórmula desnuda (sin carga)
+        const formulaDesnuda = stripCarga(card.formula);
         return {
-          question: `${card.nombre}  ${card.formula}\n${pista}`,
-          answer: card.estadosOxidacion ? card.estadosOxidacion.join('  ·  ') : `+${card.carga}`,
+          question: `${nombre}  ${formulaDesnuda}\n${pista}`,
+          answer: nombrePropio
+            ? `Carga: +${card.carga}`
+            : card.estadosOxidacion.join('  ·  '),
         };
       }
 
-      // Aniones: nombre + fórmula con ? superíndice
+      // Aniones: fórmula desnuda
       return {
-        question: `${card.nombre}  ${maskCarga(card.formula)}`,
+        question: `${nombre}  ${stripCarga(card.formula)}`,
         answer: `Carga: ${card.carga > 0 ? '+' : ''}${card.carga}`,
       };
 
     case 'sales':
-      return { question: card.nombre, answer: card.sales };
+      return { question: nombre, answer: card.sales };
     default:
-      return { question: card.nombre, answer: card.formula };
+      return { question: nombre, answer: card.formula };
   }
 }
 
-// Muestra la fórmula sin la carga, seguida de (?)
-// Quita el número de carga y pone ˣ superíndice + signo
-// SO₄²⁻ → SO₄ˣ⁻   NH₄⁺ → NH₄ˣ⁺   Fe → Feˣ
-function maskCarga(formula) {
-  // Quitar número superíndice, mantener signo, insertar ˣ antes
-  let masked = formula.replace(/[²³⁴⁵⁶⁷⁸⁹]([⁺⁻])/, 'ˣ$1');
-  // Sin número (ej H⁺, F⁻) → insertar ˣ antes del signo
-  if (masked === formula) {
-    masked = formula.replace(/([⁺⁻])/, 'ˣ$1');
-  }
-  return masked;
+function capitalize(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Quita toda la carga de la fórmula (número superíndice + signo)
+// SO₄²⁻ → SO₄   NH₄⁺ → NH₄   Fe²⁺ → Fe
+function stripCarga(formula) {
+  return formula.replace(/[²³⁴⁵⁶⁷⁸⁹]?[⁺⁻]/, '');
 }
 
 function setCardQuestion(el, mainQ, hintQ) {
-  if (hintQ) {
-    el.innerHTML = `${mainQ}<span class="card-question-hint">${hintQ}</span>`;
+  // If mainQ contains "  " (double space), split into name + formula
+  const parts = mainQ.split('  ');
+  let html;
+  if (parts.length >= 2) {
+    const name    = parts[0];
+    const formula = parts.slice(1).join('  ');
+    html = `${name} — <span class="card-formula-bold">${formula}</span>`;
   } else {
-    el.textContent = mainQ;
+    html = mainQ;
   }
+  if (hintQ) html += `<span class="card-question-hint">${hintQ}</span>`;
+  el.innerHTML = html;
 }
 
 function buildDetails(card, mode) {
@@ -400,7 +398,7 @@ function buildDetails(card, mode) {
     }
     rows.push({ l: 'Reacción', v: card.reaccion });
   } else {
-    if (mode !== 'nombre-formula') rows.push({ l: 'Nombre',  v: card.nombre });
+    if (mode !== 'nombre-formula') rows.push({ l: 'Nombre',  v: capitalize(card.nombre) });
     if (mode !== 'formula-nombre') rows.push({ l: 'Fórmula', v: card.formula });
     if (isAcido) {
       if (mode !== 'carga') rows.push({ l: 'Anión', v: card.anion });
