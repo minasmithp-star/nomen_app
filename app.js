@@ -25,7 +25,7 @@ const SECTION_COLORS = {
   alcalinos:        { a: '#5a7aaa', bg: '#e2eaf5', b: '#b8cce8' }, // azul slate
   alcalinotérreos:  { a: '#4a8c85', bg: '#dff0ee', b: '#b0d8d4' }, // teal
   transición:       { a: '#8060a0', bg: '#ede8f5', b: '#c8b8e0' }, // púrpura
-  principales:      { a: '#9a7840', bg: '#f2e8d4', b: '#d4c090' }, // ochre
+  'post-transición':    { a: '#9a7840', bg: '#f2e8d4', b: '#d4c090' }, // ochre
   lantánidos:       { a: '#b06080', bg: '#f5e0ea', b: '#e0b8cc' }, // rosa
   hidrógeno:        { a: '#5c8a65', bg: '#e8f0e9', b: '#b8d4bc' }, // sage
   // Ácidos
