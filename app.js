@@ -557,3 +557,7 @@ updateHomeStats();
 showScreen('home');
 initNotifications();
 initCloudSync();
+
+// Exponer funciones al scope global (necesario con type="module")
+window.handleFlip = handleFlip;
+window.rate       = rate;
