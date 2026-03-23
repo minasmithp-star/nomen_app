@@ -320,12 +320,7 @@ const CATIONES = [
     reaccion: "Ba²⁺ + SO₄²⁻ → BaSO₄↓ blanco" },
 
   // ── Transición (agrupados por elemento) ──
-  { id: 116, nombre: "hierro",    formula: "Fe", carga: null, tipo: "cationes", subgrupo: "transición",
-    elemento: "hierro", estadosOxidacion: ["+2", "+3"],
-    origen: "Fe + ácido", sales: "FeSO₄ (+2), FeCl₃ (+3)",
-    reaccion: "Fe²⁺ → Fe(OH)₂↓ verde; Fe³⁺ + SCN⁻ → rojo sangre" },
-
-  // Tarjetas separadas con nombre propio (ferroso/férrico)
+  // Tarjetas con nombre propio (ferroso/férrico)
   { id: 116.1, nombre: "ferroso",  formula: "Fe²⁺", carga: +2, tipo: "cationes", subgrupo: "transición",
     elemento: "hierro", estadosOxidacion: ["+2"], nombrePropio: true,
     origen: "Fe + H₂SO₄ diluido", sales: "FeSO₄, FeCl₂",
@@ -335,12 +330,7 @@ const CATIONES = [
     origen: "Fe + HNO₃ o H₂SO₄ conc.", sales: "Fe₂(SO₄)₃, FeCl₃",
     reaccion: "Fe³⁺ + SCN⁻ → [Fe(SCN)]²⁺ rojo sangre (identif.)" },
 
-  { id: 117, nombre: "cobre",     formula: "Cu", carga: null, tipo: "cationes", subgrupo: "transición",
-    elemento: "cobre", estadosOxidacion: ["+1", "+2"],
-    origen: "Cu + HNO₃", sales: "Cu₂SO₄ (+1), CuSO₄ (+2)",
-    reaccion: "Cu²⁺ + 2OH⁻ → Cu(OH)₂↓ azul; con NH₃ → [Cu(NH₃)₄]²⁺" },
-
-  // Tarjetas separadas con nombre propio (cuproso/cúprico)
+  // Tarjetas con nombre propio (cuproso/cúprico)
   { id: 117.1, nombre: "cuproso", formula: "Cu⁺",  carga: +1, tipo: "cationes", subgrupo: "transición",
     elemento: "cobre", estadosOxidacion: ["+1"], nombrePropio: true,
     origen: "Cu₂O + HCl", sales: "CuCl, Cu₂SO₄",
