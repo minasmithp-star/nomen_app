@@ -300,12 +300,8 @@ function _fillCard(card) {
   $('card-group-label').textContent = groupText;
   $('card-group-label-back').textContent = groupText;
 
-  const q = buildQuestion(card, session.mode);
-  const parts = q.question.split('\n');
-  const mainQ = parts[0];
-  const hintQ = parts[1] || '';
-  setCardQuestion($('card-question'), mainQ, hintQ);
-  $('card-answer').innerHTML = `<span class="card-formula-bold">${q.answer}</span>`;
+  setCardQuestion($('card-question'), session.mode, card);
+  setCardAnswer($('card-answer'), session.mode, card);
   buildDetails(card, session.mode);
 }
 
@@ -367,17 +363,106 @@ function stripCarga(formula) {
   return formula.replace(/[²³⁴⁵⁶⁷⁸⁹]?[⁺⁻]/, '');
 }
 
-function setCardQuestion(el, mainQ, hintQ) {
-  const parts = mainQ.split('  ');
-  let html;
-  if (parts.length >= 2) {
-    const name    = parts[0];
-    const formula = parts.slice(1).join('  ');
-    html = `${name} — <span class="card-formula-bold">${formula}</span>`;
-  } else {
-    html = mainQ;
+// ── Helpers de estilo ──────────────────────────────────
+// Nombre: DM Serif Display, negrita, negro
+function styledNombre(text) {
+  return `<span class="st-nombre">${text}</span>`;
+}
+// Fórmula: DM Serif Display, negrita, itálica, color acento
+function styledFormula(text) {
+  return `<span class="st-formula">${text}</span>`;
+}
+// Respuesta de carga/sales: DM Serif Display, negrita, color acento
+function styledRespuesta(text) {
+  return `<span class="st-respuesta">${text}</span>`;
+}
+
+function setCardQuestion(el, mode, card) {
+  const nombre  = capitalize(card.nombre);
+  const isCation = card.tipo === 'cationes';
+  const nombrePropio = card.nombrePropio || card.subgrupo === 'poliatómicos';
+
+  let html = '';
+  let hint = '';
+
+  switch (mode) {
+    case 'nombre-formula':
+      // Frente: solo nombre en negro serif
+      html = styledNombre(nombre);
+      break;
+
+    case 'formula-nombre':
+      // Frente: fórmula estilizada
+      html = styledFormula(card.formula);
+      break;
+
+    case 'carga': {
+      const n = card.estadosOxidacion ? card.estadosOxidacion.length : 1;
+      hint = n === 1 ? 'tiene 1 estado de oxidación' : `tiene ${n} estados de oxidación`;
+      if (isCation) {
+        const desnuda = stripCarga(card.formula);
+        html = `${styledNombre(nombre)} — ${styledFormula(desnuda)}`;
+      } else {
+        // Anión
+        html = `${styledNombre(nombre)} — ${styledFormula(stripCarga(card.formula))}`;
+        hint = '';
+      }
+      break;
+    }
+
+    case 'sales':
+      // Frente: solo nombre
+      html = styledNombre(nombre);
+      break;
+
+    default:
+      html = styledNombre(nombre);
   }
-  if (hintQ) html += `<br><span class="card-question-hint">${hintQ}</span>`;
+
+  if (hint) html += `<br><span class="card-question-hint">${hint}</span>`;
+  el.innerHTML = html;
+}
+
+function setCardAnswer(el, mode, card) {
+  const nombre = capitalize(card.nombre);
+  const isCation = card.tipo === 'cationes';
+  const isAcido  = card.tipo === 'hidrácido' || card.tipo === 'oxoácido';
+  const nombrePropio = card.nombrePropio || card.subgrupo === 'poliatómicos';
+
+  let html = '';
+
+  switch (mode) {
+    case 'nombre-formula':
+      // Reverso: fórmula itálica color acento
+      html = styledFormula(card.formula);
+      break;
+
+    case 'formula-nombre':
+      // Reverso: nombre negro serif
+      html = styledNombre(nombre);
+      break;
+
+    case 'carga':
+      if (isAcido) {
+        html = styledRespuesta(card.anion);
+      } else if (isCation) {
+        const resp = nombrePropio
+          ? `Carga: +${card.carga}`
+          : card.estadosOxidacion.join('  ·  ');
+        html = styledRespuesta(resp);
+      } else {
+        html = styledRespuesta(`Carga: ${card.carga > 0 ? '+' : ''}${card.carga}`);
+      }
+      break;
+
+    case 'sales':
+      html = styledRespuesta(card.sales);
+      break;
+
+    default:
+      html = styledFormula(card.formula);
+  }
+
   el.innerHTML = html;
 }
 
@@ -415,7 +500,7 @@ function buildDetails(card, mode) {
     const div = document.createElement('div');
     div.className = 'detail-pill';
     const valHtml = r.isFormula
-      ? `<span class="card-formula-bold" style="font-size:.85rem">${r.v}</span>`
+      ? `<span class="st-formula" style="font-size:.85rem">${r.v}</span>`
       : r.v;
     div.innerHTML = `<span class="dpill-label">${r.l}</span><span class="dpill-val">${valHtml}</span>`;
     container.appendChild(div);
@@ -476,12 +561,8 @@ function rate(level) {
     const groupText = buildGroupLabel(next);
     $('card-group-label').textContent      = groupText;
     $('card-group-label-back').textContent = groupText;
-    const q = buildQuestion(next, session.mode);
-    const parts = q.question.split('\n');
-    const mainQ = parts[0];
-    const hintQ = parts[1] || '';
-    setCardQuestion($('card-question'), mainQ, hintQ);
-    $('card-answer').innerHTML = `<span class="card-formula-bold">${q.answer}</span>`;
+    setCardQuestion($('card-question'), session.mode, next);
+    setCardAnswer($('card-answer'), session.mode, next);
     buildDetails(next, session.mode);
 
     const pct = (session.index / session.queue.length) * 100;
