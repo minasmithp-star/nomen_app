@@ -303,7 +303,7 @@ body {
   text-align: center; line-height: 1.25; white-space: pre-line;
 }
 
-/* Fórmula en negrita DM Serif Display */
+/* Fórmula en DM Serif Display itálica con color acento */
 .card-formula-bold {
   font-family: 'DM Serif Display', serif;
   font-weight: 400;
