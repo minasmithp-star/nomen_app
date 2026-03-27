@@ -41,6 +41,9 @@ const PT_FLASHCARDS = {
   'O':  { cargas: '−2',                sub: 'nonmetal' },
   'P':  { cargas: '−3',                sub: 'nonmetal' },
   'S':  { cargas: '−2',                sub: 'nonmetal' },
+  'C':  { cargas: 'en CO₃²⁻, CN⁻',    sub: 'nonmetal' },
+  'B':  { cargas: 'en BO₃³⁻',         sub: 'nonmetal' },
+  'As': { cargas: 'en HAsO₄²⁻',       sub: 'nonmetal' },
 };
 
 const PT_COLORS = {
@@ -249,6 +252,8 @@ function hidePTTooltip() {
 }
 
 window.openPT = function() {
+  const container = document.getElementById('pt-table');
+  if (container) container.innerHTML = '';
   buildPT();
   document.getElementById('pt-overlay').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
