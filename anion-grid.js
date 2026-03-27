@@ -69,50 +69,54 @@ const AG_MONO = [
     { nombre: 'Sulfuro', formula: 'S²⁻' },
   ]},
   { group: 'Carga −3', items: [
-    { nombre: 'Nitruro',  formula: 'N³⁻' },
-    { nombre: 'Fosfuro',  formula: 'P³⁻' },
+    { nombre: 'Nitruro', formula: 'N³⁻' },
+    { nombre: 'Fosfuro', formula: 'P³⁻' },
   ]},
 ];
 
 let agTab = 'poly';
 
-function buildAG(tab) {
-  const body = document.getElementById('ag-body');
-  body.innerHTML = '';
-  const data = tab === 'poly' ? AG_POLY : AG_MONO;
-
-  const grid = document.createElement('div');
-  grid.className = 'ag-grid';
-
-  // Pair groups in rows of 2
-  for (let i = 0; i < data.length; i += 2) {
+function buildAGSection(groups, cellClass) {
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < groups.length; i += 2) {
     const row = document.createElement('div');
     row.className = 'ag-row';
-
-    [data[i], data[i+1]].forEach(grp => {
+    [groups[i], groups[i+1]].forEach(grp => {
       if (!grp) return;
       const col = document.createElement('div');
       col.className = 'ag-col';
-
-      const title = document.createElement('div');
-      title.className = 'ag-group-title';
-      title.textContent = grp.group;
-      col.appendChild(title);
-
+      const t = document.createElement('div');
+      t.className = 'ag-group-title';
+      t.textContent = grp.group;
+      col.appendChild(t);
       grp.items.forEach(item => {
         const cell = document.createElement('div');
-        cell.className = 'ag-cell';
+        cell.className = cellClass;
         cell.innerHTML = `<span class="ag-nombre">${item.nombre}</span><span class="ag-formula">${item.formula}</span>`;
         col.appendChild(cell);
       });
-
       row.appendChild(col);
     });
-
-    grid.appendChild(row);
+    frag.appendChild(row);
   }
+  return frag;
+}
 
-  body.appendChild(grid);
+function buildAG(tab) {
+  const body = document.getElementById('ag-body');
+  body.innerHTML = '';
+
+  if (tab === 'poly' || tab === 'all') {
+    body.appendChild(buildAGSection(AG_POLY, 'ag-cell-poly'));
+  }
+  if (tab === 'mono' || tab === 'all') {
+    if (tab === 'all') {
+      const sep = document.createElement('hr');
+      sep.style.cssText = 'border:none;border-top:1px solid var(--border);margin:4px 0 10px';
+      body.appendChild(sep);
+    }
+    body.appendChild(buildAGSection(AG_MONO, 'ag-cell-mono'));
+  }
 }
 
 window.openAG = function() {
