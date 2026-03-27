@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
   <title>Nomen</title>
   <meta name="description" content="Flashcards de nomenclatura para Química Inorgánica" />
   <meta name="theme-color" content="#f6f4ee" />
@@ -76,6 +76,7 @@
           <div style="display:flex;gap:6px;align-items:center">
             <button class="ag-tab active" data-tab="poly" onclick="switchAGTab('poly',this)">Poliatómicos</button>
             <button class="ag-tab" data-tab="mono" onclick="switchAGTab('mono',this)">Monoatómicos</button>
+            <button class="ag-tab" data-tab="all"  onclick="switchAGTab('all',this)">Todos</button>
             <button class="pt-close" onclick="closeAG()">✕</button>
           </div>
         </div>
