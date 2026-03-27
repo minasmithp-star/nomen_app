@@ -38,9 +38,10 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100dvh;
+  overflow-x: hidden;
 }
 
-#app { display: flex; flex-direction: column; min-height: 100dvh; }
+#app { display: flex; flex-direction: column; min-height: 100dvh; overflow-x: hidden; }
 .screen { display: none; flex-direction: column; min-height: 100dvh; }
 .screen.active { display: flex; }
 .hidden { display: none !important; }
@@ -669,6 +670,7 @@ body {
   border: 1.5px solid var(--border);
   background: transparent; color: var(--muted);
   cursor: pointer; transition: all var(--transition);
+  -webkit-tap-highlight-color: transparent;
 }
 .ag-tab.active {
   background: var(--sage-bg); color: var(--sage);
@@ -683,7 +685,7 @@ body {
   gap: 10px;
   margin-bottom: 10px;
 }
-.ag-col { display: flex; flex-direction: column; gap: 3px; }
+.ag-col { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 
 .ag-group-title {
   font-size: .65rem; font-weight: 500;
@@ -694,21 +696,32 @@ body {
   margin-bottom: 1px;
 }
 
-.ag-cell {
-  background: var(--surface);
-  border: 1px solid var(--border);
+/* Poliatómicos — azul */
+.ag-cell-poly {
+  background: #e2eaf5;
+  border: 1px solid #b8cce8;
   border-radius: 8px;
   padding: 5px 9px;
   display: flex; flex-direction: column; gap: 1px;
 }
-.ag-nombre {
-  font-size: .72rem;
-  color: var(--muted);
-}
-.ag-formula {
+.ag-cell-poly .ag-nombre { font-size: .72rem; color: #5a7aaa; }
+.ag-cell-poly .ag-formula {
   font-family: 'DM Serif Display', serif;
-  font-style: italic;
-  font-weight: 700;
-  font-size: .88rem;
-  color: var(--accent);
+  font-style: italic; font-weight: 700;
+  font-size: .88rem; color: #3a5a8a;
+}
+
+/* Monoatómicos — sage */
+.ag-cell-mono {
+  background: var(--sage-bg);
+  border: 1px solid var(--sage-b);
+  border-radius: 8px;
+  padding: 5px 9px;
+  display: flex; flex-direction: column; gap: 1px;
+}
+.ag-cell-mono .ag-nombre { font-size: .72rem; color: var(--sage); }
+.ag-cell-mono .ag-formula {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic; font-weight: 700;
+  font-size: .88rem; color: #3a6b44;
 }
