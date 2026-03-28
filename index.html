@@ -73,10 +73,10 @@
       <div class="pt-modal" id="ag-modal">
         <div class="pt-modal-header">
           <span class="pt-modal-title">Aniones</span>
-          <div style="display:flex;gap:6px;align-items:center">
-            <button class="ag-tab active" data-tab="poly" onclick="switchAGTab('poly',this)">Poliatómicos</button>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100% - 80px)">
+            <button class="ag-tab active" data-tab="all"  onclick="switchAGTab('all',this)">Todos</button>
+            <button class="ag-tab" data-tab="poly" onclick="switchAGTab('poly',this)">Poliatómicos</button>
             <button class="ag-tab" data-tab="mono" onclick="switchAGTab('mono',this)">Monoatómicos</button>
-            <button class="ag-tab" data-tab="all"  onclick="switchAGTab('all',this)">Todos</button>
             <button class="pt-close" onclick="closeAG()">✕</button>
           </div>
         </div>
