@@ -496,10 +496,12 @@ body {
 }
 
 .pt-modal-header {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: flex-start; justify-content: space-between;
   padding: 16px 20px 12px;
   border-bottom: 1.5px solid var(--border);
   flex-shrink: 0;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 .pt-modal-title { font-size: 1rem; font-weight: 500; color: var(--text); }
 .pt-close {
