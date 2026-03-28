@@ -74,7 +74,7 @@ const AG_MONO = [
   ]},
 ];
 
-let agTab = 'poly';
+let agTab = 'all';
 
 function buildAGSection(groups, cellClass) {
   const frag = document.createDocumentFragment();
@@ -106,16 +106,17 @@ function buildAG(tab) {
   const body = document.getElementById('ag-body');
   body.innerHTML = '';
 
-  if (tab === 'poly' || tab === 'all') {
-    body.appendChild(buildAGSection(AG_POLY, 'ag-cell-poly'));
-  }
-  if (tab === 'mono' || tab === 'all') {
-    if (tab === 'all') {
-      const sep = document.createElement('hr');
-      sep.style.cssText = 'border:none;border-top:1px solid var(--border);margin:4px 0 10px';
-      body.appendChild(sep);
-    }
+  if (tab === 'mono') {
     body.appendChild(buildAGSection(AG_MONO, 'ag-cell-mono'));
+  } else if (tab === 'poly') {
+    body.appendChild(buildAGSection(AG_POLY, 'ag-cell-poly'));
+  } else {
+    // Todos: monoatómicos primero, luego poliatómicos
+    body.appendChild(buildAGSection(AG_MONO, 'ag-cell-mono'));
+    const sep = document.createElement('hr');
+    sep.style.cssText = 'border:none;border-top:1px solid var(--border);margin:4px 0 10px';
+    body.appendChild(sep);
+    body.appendChild(buildAGSection(AG_POLY, 'ag-cell-poly'));
   }
 }
 
